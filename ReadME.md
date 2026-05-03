@@ -22,7 +22,13 @@ A multi-algorithm CPU scheduling simulator built with vanilla JavaScript. Visual
   - Works offline
   - Single file application
   - Client-side only
-
+    
+- **Comparison Factor:**
+ Compares all the algorithms available and displays the algorithm that has:
+    -Lowest Waiting Time
+    -Best Turnaround Time
+    -Most Energy Efficient Time
+  
 ## Quick Start
 
 1. Download `multi_scheduler_enhanced.html`
