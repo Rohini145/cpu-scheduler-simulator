@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CPU Scheduler Simulator - Advanced</title>
+    <title>CPU Scheduler Simulator - Complete Energy Comparison</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Poppins:wght@300;400;500;600;700&display=swap');
 
@@ -20,21 +19,6 @@
             color: #e0e0e0;
             padding: 20px;
             min-height: 100vh;
-            position: relative;
-            overflow-x: hidden;
-        }
-
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at 20% 50%, rgba(74, 158, 255, 0.05) 0%, transparent 50%),
-                        radial-gradient(circle at 80% 80%, rgba(79, 255, 198, 0.05) 0%, transparent 50%);
-            pointer-events: none;
-            z-index: -1;
         }
 
         .container {
@@ -45,87 +29,20 @@
         header {
             text-align: center;
             margin-bottom: 40px;
-            animation: slideDown 0.8s ease-out;
         }
 
         h1 {
-            font-size: 3rem;
+            font-size: 2.5rem;
             background: linear-gradient(135deg, #4a9eff 0%, #4fffe6 50%, #ff6b9d 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
             font-weight: 700;
-            letter-spacing: 2px;
-            margin-bottom: 10px;
-            text-shadow: 0 0 30px rgba(74, 158, 255, 0.2);
         }
 
         .subtitle {
             color: #a0a0b0;
-            font-size: 1.05rem;
-            font-weight: 300;
-            letter-spacing: 1px;
-        }
-
-        /* Algorithm Selector */
-        .algo-selector-wrapper {
-            display: flex;
-            justify-content: center;
-            margin: 30px 0;
-            animation: slideUp 0.8s ease-out 0.2s both;
-        }
-
-        .algo-selector {
-            background: rgba(30, 30, 50, 0.8);
-            border: 2px solid rgba(74, 158, 255, 0.3);
-            border-radius: 12px;
-            padding: 20px 30px;
-            backdrop-filter: blur(10px);
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.1);
-            transition: all 0.3s ease;
-        }
-
-        .algo-selector:hover {
-            border-color: rgba(74, 158, 255, 0.6);
-            box-shadow: 0 8px 32px rgba(74, 158, 255, 0.15),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.1);
-        }
-
-        .algo-selector label {
-            color: #4a9eff;
-            font-weight: 600;
             font-size: 1rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .algo-selector select {
-            padding: 12px 18px;
-            background: linear-gradient(135deg, rgba(74, 158, 255, 0.1) 0%, rgba(79, 255, 198, 0.05) 100%);
-            color: #fff;
-            border: 2px solid rgba(74, 158, 255, 0.4);
-            border-radius: 8px;
-            font-size: 0.95rem;
-            font-weight: 500;
-            font-family: 'Poppins', sans-serif;
-            cursor: pointer;
-            min-width: 320px;
-            transition: all 0.3s ease;
-        }
-
-        .algo-selector select:hover {
-            border-color: #4a9eff;
-            background: linear-gradient(135deg, rgba(74, 158, 255, 0.2) 0%, rgba(79, 255, 198, 0.1) 100%);
-        }
-
-        .algo-selector select:focus {
-            outline: none;
-            border-color: #4a9eff;
-            box-shadow: 0 0 20px rgba(74, 158, 255, 0.4);
         }
 
         .main-grid {
@@ -133,7 +50,6 @@
             grid-template-columns: 1fr 1fr;
             gap: 24px;
             margin-bottom: 30px;
-            animation: slideUp 0.8s ease-out 0.3s both;
         }
 
         .panel {
@@ -142,45 +58,12 @@
             border-radius: 16px;
             padding: 28px;
             backdrop-filter: blur(10px);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.05);
-            transition: all 0.4s cubic-bezier(0.23, 1, 0.320, 1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .panel::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.03), transparent);
-            transition: left 0.5s ease;
-        }
-
-        .panel:hover {
-            border-color: rgba(74, 158, 255, 0.5);
-            box-shadow: 0 12px 48px rgba(74, 158, 255, 0.15),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.1);
-            transform: translateY(-4px);
-        }
-
-        .panel:hover::before {
-            left: 100%;
         }
 
         .panel h2 {
             color: #4a9eff;
             font-size: 1.4rem;
             margin-bottom: 20px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
         }
 
         .form-group {
@@ -192,9 +75,6 @@
             color: #b0b0c0;
             font-size: 0.85rem;
             margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            font-weight: 500;
         }
 
         input, select {
@@ -205,20 +85,6 @@
             border: 2px solid rgba(74, 158, 255, 0.2);
             border-radius: 8px;
             font-size: 0.95rem;
-            font-family: 'Poppins', sans-serif;
-            transition: all 0.3s ease;
-        }
-
-        input::placeholder {
-            color: #808090;
-        }
-
-        input:focus, select:focus {
-            outline: none;
-            border-color: #4a9eff;
-            background: rgba(50, 50, 80, 0.9);
-            box-shadow: 0 0 20px rgba(74, 158, 255, 0.3),
-                        inset 0 0 20px rgba(74, 158, 255, 0.05);
         }
 
         .button-group {
@@ -232,54 +98,22 @@
             padding: 14px 20px;
             background: linear-gradient(135deg, #4a9eff 0%, #2b7fd9 100%);
             color: #fff;
-            border: 2px solid transparent;
+            border: none;
             border-radius: 8px;
             font-weight: 600;
-            font-size: 0.95rem;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.23, 1, 0.320, 1);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            font-family: 'Poppins', sans-serif;
-            position: relative;
-            overflow: hidden;
-        }
-
-        button::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-            transition: left 0.5s ease;
+            transition: all 0.3s ease;
         }
 
         button:hover {
             transform: translateY(-3px);
-            box-shadow: 0 8px 24px rgba(74, 158, 255, 0.4),
-                        0 0 20px rgba(74, 158, 255, 0.2);
-        }
-
-        button:hover::before {
-            left: 100%;
-        }
-
-        button:active {
-            transform: translateY(-1px);
+            box-shadow: 0 8px 24px rgba(74, 158, 255, 0.4);
         }
 
         button.secondary {
             background: rgba(74, 158, 255, 0.15);
-            border-color: rgba(74, 158, 255, 0.4);
+            border: 2px solid rgba(74, 158, 255, 0.4);
             color: #4a9eff;
-        }
-
-        button.secondary:hover {
-            background: rgba(74, 158, 255, 0.25);
-            border-color: #4a9eff;
-            box-shadow: 0 8px 24px rgba(74, 158, 255, 0.2);
         }
 
         .process-list {
@@ -288,9 +122,7 @@
             margin: 16px 0;
             padding: 12px;
             background: rgba(50, 50, 80, 0.3);
-            border: 2px solid rgba(74, 158, 255, 0.15);
             border-radius: 8px;
-            scroll-behavior: smooth;
         }
 
         .process-item {
@@ -301,71 +133,14 @@
             padding: 12px;
             margin-bottom: 8px;
             border-radius: 8px;
-            font-size: 0.9rem;
             border-left: 4px solid #4a9eff;
-            transition: all 0.3s ease;
-            animation: slideIn 0.4s ease-out;
-        }
-
-        .process-item:hover {
-            background: linear-gradient(135deg, rgba(74, 158, 255, 0.25) 0%, rgba(79, 255, 198, 0.1) 100%);
-            transform: translateX(4px);
-        }
-
-        .process-item span {
-            color: #e0e0e0;
-        }
-
-        .process-item strong {
-            color: #4fffe6;
         }
 
         .process-item button {
             padding: 6px 12px;
             font-size: 0.8rem;
             background: rgba(220, 100, 100, 0.6);
-            border-color: rgba(220, 100, 100, 0.8);
             flex: 0 0 auto;
-            margin-left: 12px;
-        }
-
-        .process-item button:hover {
-            background: rgba(220, 80, 80, 0.8);
-            box-shadow: 0 4px 12px rgba(220, 100, 100, 0.3);
-        }
-
-        .empty-state {
-            text-align: center;
-            color: #808090;
-            padding: 24px;
-            font-style: italic;
-            font-size: 0.9rem;
-        }
-
-        .config-box {
-            background: linear-gradient(135deg, rgba(79, 255, 198, 0.1) 0%, rgba(74, 158, 255, 0.05) 100%);
-            padding: 14px;
-            border-radius: 8px;
-            margin-bottom: 12px;
-            border-left: 4px solid #4fffe6;
-            transition: all 0.3s ease;
-        }
-
-        .config-box:hover {
-            background: linear-gradient(135deg, rgba(79, 255, 198, 0.15) 0%, rgba(74, 158, 255, 0.1) 100%);
-        }
-
-        .config-title {
-            color: #4fffe6;
-            font-weight: 600;
-            margin-bottom: 6px;
-            font-size: 0.95rem;
-        }
-
-        .config-item {
-            color: #b0b0c0;
-            margin: 4px 0;
-            font-size: 0.85rem;
         }
 
         .results-section {
@@ -385,7 +160,6 @@
             background: rgba(50, 50, 80, 0.4);
             padding: 20px;
             border-radius: 12px;
-            border: 2px solid rgba(74, 158, 255, 0.15);
             overflow-x: auto;
             margin-bottom: 20px;
         }
@@ -395,15 +169,12 @@
             align-items: center;
             margin-bottom: 20px;
             gap: 12px;
-            animation: slideIn 0.4s ease-out;
         }
 
         .process-label {
             width: 50px;
             font-weight: 700;
             color: #4a9eff;
-            font-size: 0.95rem;
-            min-width: 50px;
         }
 
         .gantt-timeline {
@@ -412,7 +183,6 @@
             height: 40px;
             background: rgba(50, 50, 80, 0.5);
             border-radius: 6px;
-            border: 1px solid rgba(74, 158, 255, 0.2);
             overflow: hidden;
         }
 
@@ -427,15 +197,6 @@
             font-size: 0.85rem;
             border-radius: 4px;
             cursor: pointer;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            transition: all 0.3s cubic-bezier(0.23, 1, 0.320, 1);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-        }
-
-        .gantt-block:hover {
-            transform: scaleY(1.25) translateY(-2px);
-            box-shadow: 0 8px 24px rgba(74, 158, 255, 0.4);
-            z-index: 10;
         }
 
         .gantt-block.fcfs { background: linear-gradient(135deg, #4a9eff, #3a8eef); }
@@ -443,6 +204,19 @@
         .gantt-block.sjf { background: linear-gradient(135deg, #ff9f4a, #ff8a2b); }
         .gantt-block.priority { background: linear-gradient(135deg, #9f4aff, #8a2bff); }
         .gantt-block.energy { background: linear-gradient(135deg, #4aff7f, #2be560); }
+
+        .timeline-marks {
+            position: relative;
+            height: 25px;
+            margin-top: 5px;
+        }
+
+        .timeline-mark {
+            position: absolute;
+            font-size: 10px;
+            color: #888;
+            transform: translateX(-50%);
+        }
 
         .metrics-grid {
             display: grid;
@@ -457,364 +231,221 @@
             padding: 20px;
             border-radius: 12px;
             text-align: center;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .metric:hover {
-            border-color: rgba(74, 158, 255, 0.5);
-            transform: translateY(-4px);
-            box-shadow: 0 8px 24px rgba(74, 158, 255, 0.15);
         }
 
         .metric-label {
             color: #a0a0b0;
             font-size: 0.75rem;
             text-transform: uppercase;
-            letter-spacing: 1px;
             margin-bottom: 12px;
-            font-weight: 600;
         }
 
         .metric-value {
             color: #4fffe6;
-            font-size: 2.2rem;
+            font-size: 2rem;
             font-weight: 700;
-            letter-spacing: 1px;
+        }
+
+        .comparison-table {
+            margin-top: 20px;
+        }
+
+        .comparison-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .comparison-table th {
+            background: linear-gradient(135deg, rgba(74, 158, 255, 0.3), rgba(79, 255, 198, 0.1));
+            padding: 12px;
+            text-align: center;
+        }
+
+        .comparison-table td {
+            padding: 10px;
+            text-align: center;
+            border-bottom: 1px solid rgba(74, 158, 255, 0.2);
+        }
+
+        .best-performer {
+            background: rgba(79, 255, 198, 0.15);
+            border: 1px solid #4fffe6;
         }
 
         .table-container {
             overflow-x: auto;
             margin-bottom: 20px;
-            border-radius: 12px;
-            border: 2px solid rgba(74, 158, 255, 0.15);
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.9rem;
         }
 
-        table thead {
-            background: linear-gradient(135deg, rgba(74, 158, 255, 0.2) 0%, rgba(79, 255, 198, 0.05) 100%);
-            border-bottom: 2px solid rgba(74, 158, 255, 0.3);
-        }
-
-        table th {
-            padding: 14px;
-            color: #4a9eff;
+        th, td {
+            padding: 12px;
             text-align: left;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            border-bottom: 1px solid rgba(74, 158, 255, 0.2);
         }
 
-        table td {
+        th {
+            color: #4a9eff;
+            background: rgba(74, 158, 255, 0.1);
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #808090;
+            padding: 24px;
+        }
+
+        .config-box {
+            background: linear-gradient(135deg, rgba(79, 255, 198, 0.1) 0%, rgba(74, 158, 255, 0.05) 100%);
             padding: 14px;
-            color: #e0e0e0;
-            border-bottom: 1px solid rgba(74, 158, 255, 0.1);
-        }
-
-        table tbody tr {
-            transition: all 0.3s ease;
-        }
-
-        table tbody tr:hover {
-            background: rgba(74, 158, 255, 0.05);
-        }
-
-        table tbody tr:nth-child(even) {
-            background: rgba(50, 50, 80, 0.2);
-        }
-
-        .legend {
-            display: flex;
-            gap: 24px;
-            margin-top: 16px;
-            flex-wrap: wrap;
-            font-size: 0.9rem;
-            padding: 16px;
-            background: rgba(50, 50, 80, 0.3);
             border-radius: 8px;
-            border: 1px solid rgba(74, 158, 255, 0.1);
-        }
-
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .legend-color {
-            width: 24px;
-            height: 24px;
-            border-radius: 4px;
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-        }
-
-        /* Scrollbar */
-        ::-webkit-scrollbar {
-            width: 10px;
-            height: 10px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: rgba(50, 50, 80, 0.2);
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: linear-gradient(135deg, #4a9eff, #4fffe6);
-            border-radius: 5px;
-            border: 2px solid rgba(50, 50, 80, 0.4);
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: linear-gradient(135deg, #3a8eef, #3be550);
-        }
-
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateX(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
+            margin-bottom: 12px;
+            border-left: 4px solid #4fffe6;
         }
 
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
         }
-
-        @media (max-width: 1024px) {
-            .main-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .algo-selector {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .algo-selector select {
-                min-width: 100%;
-            }
-
-            h1 {
-                font-size: 2rem;
-            }
-
-            .metrics-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-        }
-
-        @media (max-width: 640px) {
-            .metrics-grid {
-                grid-template-columns: 1fr;
-            }
-
-            h1 {
-                font-size: 1.5rem;
-            }
-
-            .algo-selector {
-                padding: 16px;
-            }
-
-            .panel {
-                padding: 20px;
-            }
-        }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Header -->
         <header>
-            <h1>CPU SCHEDULER</h1>
-            <p class="subtitle">Advanced Multi-Algorithm Simulation Engine</p>
+            <h1>CPU SCHEDULER SIMULATOR</h1>
+            <p class="subtitle">Complete Energy Comparison - All Algorithms Calculate Energy</p>
         </header>
 
-        <!-- Algorithm Selector -->
-        <div class="algo-selector-wrapper">
-            <div class="algo-selector">
-                <label for="algorithmSelect">Algorithm:</label>
-                <select id="algorithmSelect" onchange="updateAlgorithmInfo()">
-                    <option value="fcfs">FCFS (First Come, First Served)</option>
-                    <option value="rr">Round Robin (Time Quantum = 4s)</option>
-                    <option value="sjf">SJF (Shortest Job First)</option>
-                    <option value="priority">Priority Scheduling</option>
-                    <option value="energy">Energy-Aware Scheduling</option>
-                </select>
-            </div>
-        </div>
-
-        <!-- Main Grid -->
         <div class="main-grid">
-            <!-- Input Panel -->
             <div class="panel">
                 <h2>Add Processes</h2>
-                
                 <div class="form-group">
                     <label>Process ID</label>
                     <input type="text" id="processId" placeholder="P1, P2, P3...">
                 </div>
-
                 <div class="form-group">
                     <label>Arrival Time (seconds)</label>
-                    <input type="number" id="arrivalTime" placeholder="0" min="0">
+                    <input type="number" id="arrivalTime" value="0" min="0">
                 </div>
-
                 <div class="form-group">
                     <label>Burst Time (seconds)</label>
-                    <input type="number" id="burstTime" placeholder="4" min="1">
+                    <input type="number" id="burstTime" value="4" min="1">
                 </div>
-
-                <div id="priorityGroup" class="form-group" style="display: none;">
-                    <label>Priority (1=highest)</label>
-                    <input type="number" id="priority" placeholder="1" min="1">
+                <div class="form-group">
+                    <label>Priority (0=highest, for Priority algorithm)</label>
+                    <input type="number" id="priority" value="0" min="0">
                 </div>
-
-                <button onclick="addProcess()" style="margin-top: 8px;">Add Process</button>
-
+                <button onclick="addProcess()">Add Process</button>
                 <div class="process-list" id="processList">
                     <div class="empty-state">No processes yet</div>
                 </div>
-
                 <div class="button-group">
-                    <button onclick="runSimulation()">▶ Simulate</button>
-                    <button class="secondary" onclick="resetAll()">↻ Reset</button>
+                    <button onclick="runSimulation()">Simulate</button>
+                    <button class="secondary" onclick="resetAll()">Reset</button>
                 </div>
             </div>
 
-            <!-- Config Panel -->
             <div class="panel">
                 <h2>Configuration</h2>
-                <div id="configInfo"></div>
+                <div id="configInfo" class="config-box">
+                    Select an algorithm from dropdown and click Simulate
+                </div>
+                
+                <div class="form-group">
+                    <label>Time Quantum (seconds) - for Round Robin Algorithm</label>
+                    <input type="number" id="quantumValue" value="4" min="1">
+                </div>
+                
+                <div class="form-group">
+                    <label>Select Algorithm</label>
+                    <select id="algorithmSelect">
+                        <option value="fcfs">FCFS (First Come First Served)</option>
+                        <option value="sjf">SJF (Shortest Job First)</option>
+                        <option value="priority">Priority Scheduling (0=Highest)</option>
+                        <option value="rr">Round Robin</option>
+                        <option value="energy">Energy-Aware Scheduling</option>
+                        <option value="compare">COMPARE ALL ALGORITHMS</option>
+                    </select>
+                </div>
             </div>
         </div>
 
-        <!-- Results Section -->
         <div id="resultsSection" class="results-section">
-            <!-- Gantt Chart -->
             <div class="panel full-width">
                 <h2>Gantt Chart</h2>
                 <div class="gantt-container" id="ganttChart"></div>
-                <div class="legend" id="legend"></div>
             </div>
 
-            <!-- Metrics -->
             <div class="metrics-grid" id="metricsGrid"></div>
 
-            <!-- Details Table -->
             <div class="panel full-width">
-                <h2>Execution Details</h2>
+                <h2>Process Details</h2>
                 <div class="table-container">
                     <table id="detailsTable">
-                        <thead>
-                            <tr id="tableHeader"></tr>
-                        </thead>
+                        <thead id="tableHeader"></thead>
                         <tbody id="tableBody"></tbody>
                     </table>
                 </div>
             </div>
+        </div>
 
-            <!-- Statistics -->
-            <div class="panel full-width">
-                <h2>Performance Statistics</h2>
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Metric</th>
-                                <th>Value</th>
-                            </tr>
-                        </thead>
-                        <tbody id="statsBody"></tbody>
-                    </table>
-                </div>
+        <div id="comparisonSection" class="results-section">
+            <div class="panel full-width comparison-table">
+                <h2>All Algorithms Comparison (All Calculate Energy)</h2>
+                <div id="comparisonContent"></div>
             </div>
         </div>
     </div>
 
     <script>
-        // ===== DATA & CONSTANTS =====
         let processes = [];
-        const algorithms = {
-            fcfs: { name: "FCFS", fullName: "First Come, First Served", desc: "Processes execute in arrival order. Simple but may cause waiting time for longer processes." },
-            rr: { name: "Round Robin", fullName: "Round Robin", desc: "Each process gets 4s quantum. More fair, prevents starvation. Used in many modern systems." },
-            sjf: { name: "SJF", fullName: "Shortest Job First", desc: "Shortest burst time executes first. Minimizes average waiting time but can cause starvation." },
-            priority: { name: "Priority", fullName: "Priority Scheduling", desc: "Higher priority processes execute first. Lower number = higher priority. Used in real-time systems." },
-            energy: { name: "Energy-Aware", fullName: "Energy-Aware Scheduling", desc: "Intelligently switches between HP and LP modes based on burst time to balance performance and energy." }
-        };
 
-        // ===== ADD PROCESS =====
+        // Function to calculate energy for a process based on its burst time
+        function calculateEnergy(procs) {
+            let totalEnergy = 0;
+            for (let p of procs) {
+                let useHP = p.burst <= 4;
+                let energyRate = useHP ? 5 : 2;
+                totalEnergy += p.burst * energyRate;
+            }
+            return totalEnergy;
+        }
+
         function addProcess() {
             const id = document.getElementById('processId').value.trim();
             const arrival = parseInt(document.getElementById('arrivalTime').value) || 0;
             const burst = parseInt(document.getElementById('burstTime').value) || 0;
-            const priority = parseInt(document.getElementById('priority').value) || 1;
+            const priority = parseInt(document.getElementById('priority').value) || 0;
 
             if (!id || burst <= 0) {
                 alert('Please enter valid process ID and burst time');
                 return;
             }
-
             if (processes.some(p => p.id === id)) {
                 alert('Process ID already exists');
                 return;
             }
-
             processes.push({ id, arrival, burst, priority });
             updateProcessList();
-            clearInputs();
-        }
-
-        function clearInputs() {
             document.getElementById('processId').value = '';
-            document.getElementById('arrivalTime').value = '';
+            document.getElementById('arrivalTime').value = '0';
             document.getElementById('burstTime').value = '';
-            document.getElementById('priority').value = '';
-            document.getElementById('processId').focus();
+            document.getElementById('priority').value = '0';
         }
 
         function updateProcessList() {
             const list = document.getElementById('processList');
             if (processes.length === 0) {
-                list.innerHTML = '<div class="empty-state">✨ No processes yet</div>';
+                list.innerHTML = '<div class="empty-state">No processes yet</div>';
                 return;
             }
-
             list.innerHTML = processes.map((p, i) => `
                 <div class="process-item">
-                    <span><strong>${p.id}</strong> • A:${p.arrival}s B:${p.burst}s ${p.priority ? `P:${p.priority}` : ''}</span>
+                    <span><strong>${p.id}</strong> | Arrival: ${p.arrival}s | Burst: ${p.burst}s | Priority: ${p.priority}</span>
                     <button onclick="removeProcess(${i})">Remove</button>
                 </div>
             `).join('');
@@ -827,309 +458,360 @@
 
         function updateAlgorithmInfo() {
             const algo = document.getElementById('algorithmSelect').value;
-            const info = algorithms[algo];
-            const priorityGroup = document.getElementById('priorityGroup');
             
-            priorityGroup.style.display = algo === 'priority' ? 'block' : 'none';
-
-            let configHTML = `
-                <div class="config-box">
-                    <div class="config-title">${info.fullName}</div>
-                    <div class="config-item">${info.desc}</div>
-                </div>
-            `;
-
-            if (algo === 'rr') {
-                configHTML += `
-                    <div class="config-box">
-                        <div class="config-title">Time Quantum</div>
-                        <div class="config-item">Each process gets 4 seconds before rotation</div>
-                    </div>
-                `;
-            } else if (algo === 'energy') {
-                configHTML += `
-                    <div class="config-box">
-                        <div class="config-title">HP Mode</div>
-                        <div class="config-item">Speed: 1x | Power: 5 units/s | Used for burst ≤ 4s</div>
-                    </div>
-                    <div class="config-box">
-                        <div class="config-title">LP Mode</div>
-                        <div class="config-item">Speed: 2x slower | Power: 2 units/s | Used for burst > 4s</div>
-                    </div>
-                `;
-            }
-
-            document.getElementById('configInfo').innerHTML = configHTML;
+            let info = '';
+            if (algo === 'fcfs') info = 'First Come First Served - Processes executed in arrival order.';
+            else if (algo === 'sjf') info = 'Shortest Job First - Shortest burst time executes first.';
+            else if (algo === 'priority') info = 'Priority Scheduling - Lower number = Higher priority (0 is highest).';
+            else if (algo === 'rr') info = 'Round Robin - Each process gets a fixed time quantum.';
+            else if (algo === 'energy') info = 'Energy-Aware - Intelligent HP/LP switching to optimize energy.';
+            else if (algo === 'compare') info = 'Compare All Algorithms - Shows all 5 algorithms with energy calculations.';
+            
+            document.getElementById('configInfo').innerHTML = info;
         }
 
-        // ===== SCHEDULING ALGORITHMS =====
+        // Calculate energy for a list of results (same HP/LP logic for all algorithms)
+        function calculateTotalEnergyForResults(results) {
+            let totalEnergy = 0;
+            for (let r of results) {
+                let useHP = r.burst <= 4;
+                let energyRate = useHP ? 5 : 2;
+                totalEnergy += r.burst * energyRate;
+            }
+            return totalEnergy;
+        }
+
+        // Scheduling Algorithms (ALL now include energy calculation)
         function scheduleFCFS(procs) {
             const sorted = [...procs].sort((a, b) => a.arrival - b.arrival);
-            let time = 0, timeline = [];
-
-            for (const p of sorted) {
+            let time = 0, timeline = [], results = [];
+            for (let p of sorted) {
                 if (time < p.arrival) time = p.arrival;
-                timeline.push({
-                    id: p.id, mode: 'fcfs', start: time, end: time + p.burst,
-                    duration: p.burst, arrival: p.arrival, burst: p.burst
-                });
+                timeline.push({ id: p.id, mode: 'fcfs', start: time, end: time + p.burst, duration: p.burst });
+                results.push({ id: p.id, arrival: p.arrival, burst: p.burst, start: time, finish: time + p.burst, waiting: time - p.arrival, turnaround: (time + p.burst) - p.arrival });
                 time += p.burst;
             }
-            return timeline;
-        }
-
-        function scheduleRoundRobin(procs, quantum = 4) {
-            const queue = [...procs].sort((a, b) => a.arrival - b.arrival);
-            let time = 0, timeline = [], pending = [...queue];
-            const remaining = {};
-            pending.forEach(p => remaining[p.id] = p.burst);
-
-            while (pending.length > 0) {
-                const p = pending.shift();
-                const arrival = p.arrival;
-                
-                if (time < arrival) time = arrival;
-
-                const executeTime = Math.min(remaining[p.id], quantum);
-                timeline.push({
-                    id: p.id, mode: 'rr', start: time, end: time + executeTime,
-                    duration: executeTime, arrival: p.arrival, burst: p.burst
-                });
-
-                time += executeTime;
-                remaining[p.id] -= executeTime;
-
-                if (remaining[p.id] > 0) {
-                    pending.push(p);
-                }
-            }
-            return timeline;
+            // Add energy calculation
+            let totalEnergy = calculateTotalEnergyForResults(results);
+            return { timeline, results, totalEnergy };
         }
 
         function scheduleSJF(procs) {
-            const sorted = [...procs].sort((a, b) => {
-                if (a.arrival === b.arrival) return a.burst - b.burst;
-                return a.arrival - b.arrival;
-            });
-
-            let time = 0, timeline = [], completed = new Set();
-            const all = [...sorted];
-
-            while (completed.size < all.length) {
-                const available = all.filter(p => p.arrival <= time && !completed.has(p.id))
-                    .sort((a, b) => a.burst - b.burst);
-                
+            let remaining = procs.map(p => ({ ...p, remaining: p.burst, done: false }));
+            let time = 0, timeline = [], results = [], completed = 0;
+            while (completed < procs.length) {
+                let available = remaining.filter(p => p.arrival <= time && !p.done);
                 if (available.length === 0) {
-                    const next = all.find(p => !completed.has(p.id));
-                    time = next.arrival;
+                    time = Math.min(...remaining.filter(p => !p.done).map(p => p.arrival));
                     continue;
                 }
-
-                const p = available[0];
-                timeline.push({
-                    id: p.id, mode: 'sjf', start: time, end: time + p.burst,
-                    duration: p.burst, arrival: p.arrival, burst: p.burst
-                });
-                time += p.burst;
-                completed.add(p.id);
+                available.sort((a, b) => a.remaining - b.remaining);
+                let p = available[0];
+                timeline.push({ id: p.id, mode: 'sjf', start: time, end: time + p.remaining, duration: p.remaining });
+                results.push({ id: p.id, arrival: p.arrival, burst: p.burst, start: time, finish: time + p.remaining, waiting: time - p.arrival, turnaround: (time + p.remaining) - p.arrival });
+                time += p.remaining;
+                p.done = true;
+                completed++;
             }
-            return timeline;
+            let totalEnergy = calculateTotalEnergyForResults(results);
+            return { timeline, results, totalEnergy };
         }
 
         function schedulePriority(procs) {
-            const all = [...procs];
-            let time = 0, timeline = [], completed = new Set();
-
-            while (completed.size < all.length) {
-                const available = all.filter(p => p.arrival <= time && !completed.has(p.id))
-                    .sort((a, b) => a.priority - b.priority);
-                
+            let remaining = procs.map(p => ({ ...p, remaining: p.burst, done: false }));
+            let time = 0, timeline = [], results = [], completed = 0;
+            while (completed < procs.length) {
+                let available = remaining.filter(p => p.arrival <= time && !p.done);
                 if (available.length === 0) {
-                    const next = all.find(p => !completed.has(p.id));
-                    time = next.arrival;
+                    time = Math.min(...remaining.filter(p => !p.done).map(p => p.arrival));
                     continue;
                 }
-
-                const p = available[0];
-                timeline.push({
-                    id: p.id, mode: 'priority', start: time, end: time + p.burst,
-                    duration: p.burst, arrival: p.arrival, burst: p.burst, priority: p.priority
-                });
-                time += p.burst;
-                completed.add(p.id);
+                available.sort((a, b) => a.priority - b.priority);
+                let p = available[0];
+                timeline.push({ id: p.id, mode: 'priority', start: time, end: time + p.remaining, duration: p.remaining });
+                results.push({ id: p.id, arrival: p.arrival, burst: p.burst, priority: p.priority, start: time, finish: time + p.remaining, waiting: time - p.arrival, turnaround: (time + p.remaining) - p.arrival });
+                time += p.remaining;
+                p.done = true;
+                completed++;
             }
-            return timeline;
+            let totalEnergy = calculateTotalEnergyForResults(results);
+            return { timeline, results, totalEnergy };
+        }
+
+        function scheduleRoundRobin(procs, quantum) {
+            let remaining = procs.map(p => ({ id: p.id, arrival: p.arrival, burst: p.burst, remaining: p.burst }));
+            remaining.sort((a, b) => a.arrival - b.arrival);
+            let time = 0, timeline = [], queue = [], idx = 0, startTimes = {}, finishTimes = {};
+            
+            while (idx < remaining.length || queue.length > 0) {
+                while (idx < remaining.length && remaining[idx].arrival <= time) {
+                    queue.push(remaining[idx]);
+                    idx++;
+                }
+                if (queue.length === 0 && idx < remaining.length) {
+                    time = remaining[idx].arrival;
+                    continue;
+                }
+                let p = queue.shift();
+                if (startTimes[p.id] === undefined) startTimes[p.id] = time;
+                let exec = Math.min(p.remaining, quantum);
+                timeline.push({ id: p.id, mode: 'rr', start: time, end: time + exec, duration: exec });
+                time += exec;
+                p.remaining -= exec;
+                while (idx < remaining.length && remaining[idx].arrival <= time) {
+                    queue.push(remaining[idx]);
+                    idx++;
+                }
+                if (p.remaining > 0) {
+                    queue.push(p);
+                } else {
+                    finishTimes[p.id] = time;
+                }
+            }
+            
+            let results = [];
+            for (let p of procs) {
+                let turnaround = finishTimes[p.id] - p.arrival;
+                let waiting = turnaround - p.burst;
+                results.push({ id: p.id, arrival: p.arrival, burst: p.burst, start: startTimes[p.id], finish: finishTimes[p.id], waiting: waiting, turnaround: turnaround });
+            }
+            let totalEnergy = calculateTotalEnergyForResults(results);
+            return { timeline, results, totalEnergy };
         }
 
         function scheduleEnergyAware(procs) {
             const sorted = [...procs].sort((a, b) => a.arrival - b.arrival);
-            const HP = { speed: 1.0, energy: 5 };
-            const LP = { speed: 2.0, energy: 2 };
-            let time = 0, timeline = [];
-
-            for (const p of sorted) {
+            let time = 0, timeline = [], results = [];
+            for (let p of sorted) {
                 if (time < p.arrival) time = p.arrival;
-                
-                const mode = p.burst <= 4 ? HP : LP;
-                const duration = p.burst * mode.speed;
-                
-                timeline.push({
-                    id: p.id, mode: 'energy', start: time, end: time + duration,
-                    duration: duration, arrival: p.arrival, burst: p.burst,
-                    modeType: p.burst <= 4 ? 'HP' : 'LP', energy: duration * mode.energy
-                });
-                time += duration;
+                let useHP = p.burst <= 4;
+                let energy = p.burst * (useHP ? 5 : 2);
+                timeline.push({ id: p.id, mode: 'energy', start: time, end: time + p.burst, duration: p.burst, energy: energy });
+                results.push({ id: p.id, arrival: p.arrival, burst: p.burst, start: time, finish: time + p.burst, waiting: time - p.arrival, turnaround: (time + p.burst) - p.arrival, energy: energy });
+                time += p.burst;
             }
-            return timeline;
+            let totalEnergy = results.reduce((sum, r) => sum + r.energy, 0);
+            return { timeline, results, totalEnergy };
         }
 
-        // ===== RUN SIMULATION =====
+        function displayResults(timeline, results, algoName, totalEnergy) {
+            const totalTime = Math.max(...results.map(r => r.finish));
+            const avgWait = results.reduce((s, r) => s + r.waiting, 0) / results.length;
+            const avgTurn = results.reduce((s, r) => s + r.turnaround, 0) / results.length;
+
+            let metricsHTML = `
+                <div class="metric"><div class="metric-label">Total Time</div><div class="metric-value">${totalTime.toFixed(2)}s</div></div>
+                <div class="metric"><div class="metric-label">Avg Waiting</div><div class="metric-value">${avgWait.toFixed(2)}s</div></div>
+                <div class="metric"><div class="metric-label">Avg Turnaround</div><div class="metric-value">${avgTurn.toFixed(2)}s</div></div>
+                <div class="metric"><div class="metric-label">Context Switches</div><div class="metric-value">${timeline.length - 1}</div></div>
+                <div class="metric"><div class="metric-label">Total Energy</div><div class="metric-value">${totalEnergy.toFixed(2)} units</div></div>
+            `;
+            document.getElementById('metricsGrid').innerHTML = metricsHTML;
+
+            const maxTime = totalTime;
+            let ganttHTML = '';
+            const processMap = new Map();
+            timeline.forEach(item => {
+                if (!processMap.has(item.id)) processMap.set(item.id, []);
+                processMap.get(item.id).push(item);
+            });
+            
+            for (let [id, blocks] of processMap) {
+                let rowHTML = `<div class="gantt-row"><div class="process-label">${id}</div><div class="gantt-timeline">`;
+                for (let block of blocks) {
+                    const left = (block.start / maxTime) * 100;
+                    const width = ((block.end - block.start) / maxTime) * 100;
+                    rowHTML += `<div class="gantt-block ${block.mode}" style="left: ${left}%; width: ${width}%;">${block.id}</div>`;
+                }
+                rowHTML += `</div></div>`;
+                ganttHTML += rowHTML;
+            }
+            
+            let timelineMarks = '<div class="timeline-marks">';
+            let interval = Math.ceil(maxTime / 10);
+            for (let i = 0; i <= maxTime; i += interval) {
+                let pos = (i / maxTime) * 100;
+                timelineMarks += `<div class="timeline-mark" style="left: ${pos}%;">${i}s</div>`;
+            }
+            timelineMarks += '</div>';
+            ganttHTML += timelineMarks;
+            document.getElementById('ganttChart').innerHTML = ganttHTML;
+
+            let headers = ['Process', 'Arrival', 'Burst', 'Start', 'Finish', 'Waiting', 'Turnaround'];
+            if (algoName === 'priority') headers = ['Process', 'Arrival', 'Burst', 'Priority', 'Start', 'Finish', 'Waiting', 'Turnaround'];
+            if (algoName === 'energy') headers.push('Energy');
+            
+            document.getElementById('tableHeader').innerHTML = `<tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>`;
+            let tableBody = '';
+            for (let r of results) {
+                if (algoName === 'priority') {
+                    tableBody += `<tr>
+                        <td>${r.id}</td>
+                        <td>${r.arrival}</td>
+                        <td>${r.burst}</td>
+                        <td>${r.priority}</td>
+                        <td>${r.start.toFixed(2)}</td>
+                        <td>${r.finish.toFixed(2)}</td>
+                        <td>${r.waiting.toFixed(2)}</td>
+                        <td>${r.turnaround.toFixed(2)}</td>
+                    </tr>`;
+                } else if (algoName === 'energy') {
+                    tableBody += `<tr>
+                        <td>${r.id}</td>
+                        <td>${r.arrival}</td>
+                        <td>${r.burst}</td>
+                        <td>${r.start.toFixed(2)}</td>
+                        <td>${r.finish.toFixed(2)}</td>
+                        <td>${r.waiting.toFixed(2)}</td>
+                        <td>${r.turnaround.toFixed(2)}</td>
+                        <td>${r.energy.toFixed(2)}</td>
+                    </tr>`;
+                } else {
+                    tableBody += `<tr>
+                        <td>${r.id}</td>
+                        <td>${r.arrival}</td>
+                        <td>${r.burst}</td>
+                        <td>${r.start.toFixed(2)}</td>
+                        <td>${r.finish.toFixed(2)}</td>
+                        <td>${r.waiting.toFixed(2)}</td>
+                        <td>${r.turnaround.toFixed(2)}</td>
+                    </tr>`;
+                }
+            }
+            document.getElementById('tableBody').innerHTML = tableBody;
+        }
+
+        function compareAllAlgorithms() {
+            if (processes.length === 0) {
+                alert('Please add at least one process first');
+                return;
+            }
+            
+            const quantum = parseInt(document.getElementById('quantumValue').value) || 4;
+            
+            let fcfsResult = scheduleFCFS(processes);
+            let sjfResult = scheduleSJF(processes);
+            let priorityResult = schedulePriority(processes);
+            let rrResult = scheduleRoundRobin(processes, quantum);
+            let energyResult = scheduleEnergyAware(processes);
+            
+            let comparisonData = [
+                { name: 'FCFS', results: fcfsResult.results, totalEnergy: fcfsResult.totalEnergy },
+                { name: 'SJF', results: sjfResult.results, totalEnergy: sjfResult.totalEnergy },
+                { name: 'Priority', results: priorityResult.results, totalEnergy: priorityResult.totalEnergy },
+                { name: 'Round Robin', results: rrResult.results, totalEnergy: rrResult.totalEnergy },
+                { name: 'Energy-Aware', results: energyResult.results, totalEnergy: energyResult.totalEnergy }
+            ];
+            
+            let bestWait = Infinity, bestTurn = Infinity, bestTime = Infinity, bestEnergy = Infinity;
+            let bestWaitAlgo = '', bestTurnAlgo = '', bestTimeAlgo = '', bestEnergyAlgo = '';
+            
+            for (let data of comparisonData) {
+                let totalTime = Math.max(...data.results.map(r => r.finish));
+                let avgWait = data.results.reduce((s, r) => s + r.waiting, 0) / data.results.length;
+                let avgTurn = data.results.reduce((s, r) => s + r.turnaround, 0) / data.results.length;
+                
+                data.totalTime = totalTime;
+                data.avgWait = avgWait;
+                data.avgTurn = avgTurn;
+                
+                if (avgWait < bestWait) { bestWait = avgWait; bestWaitAlgo = data.name; }
+                if (avgTurn < bestTurn) { bestTurn = avgTurn; bestTurnAlgo = data.name; }
+                if (totalTime < bestTime) { bestTime = totalTime; bestTimeAlgo = data.name; }
+                if (data.totalEnergy < bestEnergy) { bestEnergy = data.totalEnergy; bestEnergyAlgo = data.name; }
+            }
+            
+            let comparisonHTML = `
+                <div class="table-container">
+                    <h3 style="margin-bottom: 15px; color: #4fffe6;">Using Quantum: ${quantum}s for Round Robin | Energy: HP(≤4s)=5u/s, LP(>4s)=2u/s</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Algorithm</th>
+                                <th>Total Time (s)</th>
+                                <th>Avg Waiting (s)</th>
+                                <th>Avg Turnaround (s)</th>
+                                <th>Total Energy (units)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            for (let data of comparisonData) {
+                let isBestWait = data.name === bestWaitAlgo;
+                let isBestTurn = data.name === bestTurnAlgo;
+                let isBestTime = data.name === bestTimeAlgo;
+                let isBestEnergy = data.name === bestEnergyAlgo;
+                let rowClass = (isBestWait || isBestTurn || isBestTime || isBestEnergy) ? 'class="best-performer"' : '';
+                
+                comparisonHTML += `<tr ${rowClass}>
+                    <td><strong>${data.name}</strong> ${(isBestWait || isBestTurn || isBestTime || isBestEnergy) ? '🏆' : ''}</td>
+                    <td style="color: ${isBestTime ? '#4fffe6' : '#fff'}">${data.totalTime.toFixed(2)}s</td>
+                    <td style="color: ${isBestWait ? '#4fffe6' : '#fff'}">${data.avgWait.toFixed(2)}s</td>
+                    <td style="color: ${isBestTurn ? '#4fffe6' : '#fff'}">${data.avgTurn.toFixed(2)}s</td>
+                    <td style="color: ${isBestEnergy ? '#4fffe6' : '#fff'}">${data.totalEnergy.toFixed(2)} units</td>
+                </tr>`;
+            }
+            
+            comparisonHTML += `
+                        </tbody>
+                    </table>
+                </div>
+                <div style="margin-top: 20px; padding: 20px; background: linear-gradient(135deg, rgba(79, 255, 198, 0.1), rgba(74, 158, 255, 0.05)); border-radius: 12px; border-left: 4px solid #4fffe6;">
+                    <h3 style="color: #4fffe6; margin-bottom: 15px;">Best Performers</h3>
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px;">
+                        <div><strong>Fastest Execution:</strong><br><span style="color: #4fffe6; font-size: 1.1rem;">${bestTimeAlgo}</span><br>${bestTime.toFixed(2)}s</div>
+                        <div><strong>Lowest Waiting:</strong><br><span style="color: #4fffe6; font-size: 1.1rem;">${bestWaitAlgo}</span><br>${bestWait.toFixed(2)}s</div>
+                        <div><strong>Best Turnaround:</strong><br><span style="color: #4fffe6; font-size: 1.1rem;">${bestTurnAlgo}</span><br>${bestTurn.toFixed(2)}s</div>
+                        <div><strong>Most Energy Efficient:</strong><br><span style="color: #4fffe6; font-size: 1.1rem;">${bestEnergyAlgo}</span><br>${bestEnergy.toFixed(2)} units</div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('comparisonContent').innerHTML = comparisonHTML;
+            document.getElementById('comparisonSection').classList.add('visible');
+            document.getElementById('resultsSection').classList.remove('visible');
+            document.getElementById('comparisonSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
         function runSimulation() {
             if (processes.length === 0) {
                 alert('Please add at least one process');
                 return;
             }
-
+            
             const algo = document.getElementById('algorithmSelect').value;
-            let timeline;
-
+            
+            if (algo === 'compare') {
+                compareAllAlgorithms();
+                return;
+            }
+            
+            const quantum = parseInt(document.getElementById('quantumValue').value) || 4;
+            let result;
+            
             switch(algo) {
-                case 'fcfs': timeline = scheduleFCFS(processes); break;
-                case 'rr': timeline = scheduleRoundRobin(processes); break;
-                case 'sjf': timeline = scheduleSJF(processes); break;
-                case 'priority': timeline = schedulePriority(processes); break;
-                case 'energy': timeline = scheduleEnergyAware(processes); break;
+                case 'fcfs': result = scheduleFCFS(processes); break;
+                case 'sjf': result = scheduleSJF(processes); break;
+                case 'priority': result = schedulePriority(processes); break;
+                case 'rr': result = scheduleRoundRobin(processes, quantum); break;
+                case 'energy': result = scheduleEnergyAware(processes); break;
+                default: result = scheduleFCFS(processes);
             }
-
-            displayResults(timeline, algo);
+            
+            displayResults(result.timeline, result.results, algo, result.totalEnergy);
             document.getElementById('resultsSection').classList.add('visible');
-            setTimeout(() => {
-                document.querySelector('.metrics-grid').scrollIntoView({ behavior: 'smooth' });
-            }, 100);
-        }
-
-        // ===== DISPLAY RESULTS =====
-        function displayResults(timeline, algo) {
-            const maxTime = Math.max(...timeline.map(t => t.end)) * 1.1;
-
-            // Gantt Chart
-            let ganttHTML = '';
-            for (const item of timeline) {
-                const left = (item.start / maxTime) * 100;
-                const width = ((item.end - item.start) / maxTime) * 100;
-                ganttHTML += `
-                    <div class="gantt-row">
-                        <div class="process-label">${item.id}</div>
-                        <div class="gantt-timeline">
-                            <div class="gantt-block ${item.mode}" 
-                                 style="left: ${left}%; width: ${width}%;"
-                                 title="${item.id}: ${item.start.toFixed(2)}s - ${item.end.toFixed(2)}s (${item.duration.toFixed(2)}s)">
-                                ${item.id}
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }
-            document.getElementById('ganttChart').innerHTML = ganttHTML;
-
-            // Legend
-            const legendMap = {
-                fcfs: '#4a9eff', rr: '#7fd3ff', sjf: '#ff9f4a',
-                priority: '#9f4aff', energy: '#4aff7f'
-            };
-            let legendHTML = '';
-            for (const [key, color] of Object.entries(legendMap)) {
-                if (timeline.some(t => t.mode === key)) {
-                    legendHTML += `
-                        <div class="legend-item">
-                            <div class="legend-color" style="background: linear-gradient(135deg, ${color}, ${color}dd);"></div>
-                            <span>${algorithms[key].name}</span>
-                        </div>
-                    `;
-                }
-            }
-            document.getElementById('legend').innerHTML = legendHTML;
-
-            // Metrics
-            const totalTime = timeline[timeline.length - 1].end;
-            const avgWaitTime = timeline.reduce((sum, t) => sum + (t.start - t.arrival), 0) / timeline.length;
-            const avgTurnaround = timeline.reduce((sum, t) => sum + (t.end - t.arrival), 0) / timeline.length;
-            const totalEnergy = timeline.reduce((sum, t) => sum + (t.energy || t.duration * 5), 0);
-
-            const metricsHTML = `
-                <div class="metric">
-                    <div class="metric-label">Total Time</div>
-                    <div class="metric-value">${totalTime.toFixed(2)}s</div>
-                </div>
-                <div class="metric">
-                    <div class="metric-label">Avg Wait</div>
-                    <div class="metric-value">${avgWaitTime.toFixed(2)}s</div>
-                </div>
-                <div class="metric">
-                    <div class="metric-label">Avg Turnaround</div>
-                    <div class="metric-value">${avgTurnaround.toFixed(2)}s</div>
-                </div>
-                ${algo === 'energy' ? `<div class="metric">
-                    <div class="metric-label">Total Energy</div>
-                    <div class="metric-value">${totalEnergy.toFixed(2)}</div>
-                </div>` : ''}
-                <div class="metric">
-                    <div class="metric-label">Switches</div>
-                    <div class="metric-value">${timeline.length - 1}</div>
-                </div>
-            `;
-            document.getElementById('metricsGrid').innerHTML = metricsHTML;
-
-            // Table Header
-            const headerCells = ['Process', 'Start (s)', 'End (s)', 'Duration (s)', 'Wait (s)', 'Turnaround (s)'];
-            if (algo === 'priority') headerCells.splice(1, 0, 'Priority');
-            if (algo === 'energy') headerCells.push('Mode', 'Energy');
-
-            document.getElementById('tableHeader').innerHTML = headerCells
-                .map(h => `<th>${h}</th>`).join('');
-
-            // Table Body
-            const tableRows = timeline.map(t => {
-                let cells = [
-                    t.id,
-                    t.start.toFixed(2),
-                    t.end.toFixed(2),
-                    t.duration.toFixed(2),
-                    (t.start - t.arrival).toFixed(2),
-                    (t.end - t.arrival).toFixed(2)
-                ];
-                
-                if (algo === 'priority') cells.splice(1, 0, t.priority);
-                if (algo === 'energy') {
-                    cells.push(t.modeType);
-                    cells.push(t.energy.toFixed(2));
-                }
-
-                return `<tr>${cells.map(c => `<td>${c}</td>`).join('')}</tr>`;
-            }).join('');
-            document.getElementById('tableBody').innerHTML = tableRows;
-
-            // Statistics
-            const statsHTML = `
-                <tr><td>Total Execution Time</td><td><strong>${totalTime.toFixed(2)}s</strong></td></tr>
-                <tr><td>Average Waiting Time</td><td><strong>${avgWaitTime.toFixed(2)}s</strong></td></tr>
-                <tr><td>Average Turnaround Time</td><td><strong>${avgTurnaround.toFixed(2)}s</strong></td></tr>
-                <tr><td>CPU Utilization</td><td><strong>100%</strong></td></tr>
-                <tr><td>Total Processes</td><td><strong>${timeline.length}</strong></td></tr>
-                <tr><td>Context Switches</td><td><strong>${timeline.length - 1}</strong></td></tr>
-                ${algo === 'energy' ? `<tr><td>Total Energy Consumed</td><td><strong>${totalEnergy.toFixed(2)} units</strong></td></tr>` : ''}
-            `;
-            document.getElementById('statsBody').innerHTML = statsHTML;
+            document.getElementById('comparisonSection').classList.remove('visible');
         }
 
         function resetAll() {
             processes = [];
             updateProcessList();
             document.getElementById('resultsSection').classList.remove('visible');
-            clearInputs();
+            document.getElementById('comparisonSection').classList.remove('visible');
         }
 
-        // Initialize
+        document.getElementById('algorithmSelect').addEventListener('change', updateAlgorithmInfo);
         updateAlgorithmInfo();
     </script>
 </body>
