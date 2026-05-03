@@ -1,818 +1,1018 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CPU Scheduler Simulator - Complete Energy Comparison</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Poppins:wght@300;400;500;600;700&display=swap');
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CPU Scheduler Simulator</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Poppins',sans-serif;background:linear-gradient(135deg,#0f0f1e,#1a1a2e,#16213e);color:#e0e0e0;padding:20px;min-height:100vh}
+.wrap{max-width:1500px;margin:0 auto}
+header{text-align:center;margin-bottom:32px}
+h1{font-size:2rem;background:linear-gradient(135deg,#4a9eff,#4fffe6,#ff6b9d);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-weight:700}
+.sub{color:#a0a0b0;font-size:.85rem;margin-top:4px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px}
+.panel{background:rgba(30,30,50,.65);border:1.5px solid rgba(74,158,255,.2);border-radius:16px;padding:22px}
+.panel h2{color:#4a9eff;font-size:1.15rem;margin-bottom:14px}
+.fg{margin-bottom:12px}
+.fg label{display:block;color:#aaa;font-size:.78rem;margin-bottom:5px}
+input,select{width:100%;padding:9px 13px;background:rgba(50,50,80,.65);color:#fff;border:1.5px solid rgba(74,158,255,.2);border-radius:8px;font-size:.88rem;outline:none}
+input:focus,select:focus{border-color:rgba(74,158,255,.5)}
+.btn-row{display:flex;gap:10px;margin-top:14px}
+button{flex:1;padding:11px 14px;background:linear-gradient(135deg,#4a9eff,#2b7fd9);color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-size:.85rem;transition:all .2s}
+button:hover{transform:translateY(-2px);box-shadow:0 5px 16px rgba(74,158,255,.35)}
+button.sec{background:rgba(74,158,255,.1);border:1.5px solid rgba(74,158,255,.3);color:#4a9eff}
+button.danger{background:rgba(220,80,80,.15);border:1.5px solid rgba(220,80,80,.4);color:#ff6060}
+button:disabled{opacity:.38;cursor:not-allowed;transform:none;box-shadow:none}
+.plist{max-height:200px;overflow-y:auto;margin:12px 0;padding:8px;background:rgba(50,50,80,.3);border-radius:8px}
+.pi{display:flex;justify-content:space-between;align-items:center;background:rgba(74,158,255,.1);padding:9px 11px;margin-bottom:6px;border-radius:8px;border-left:3px solid #4a9eff;font-size:.8rem}
+.pi button{padding:4px 9px;font-size:.72rem;background:rgba(220,80,80,.5);flex:0 0 auto;border:none}
+.cfgbox{background:rgba(79,255,198,.08);padding:11px;border-radius:8px;margin-bottom:12px;border-left:3px solid #4fffe6;font-size:.8rem;color:#b0b0c0;line-height:1.5}
+.full{grid-column:1/-1}
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+/* PRESETS */
+.presets-panel{background:rgba(30,30,50,.65);border:1.5px solid rgba(255,107,157,.2);border-radius:16px;padding:22px;margin-bottom:24px}
+.presets-panel h2{color:#ff6b9d;font-size:1.15rem;margin-bottom:6px}
+.preset-desc{font-size:.78rem;color:#888;margin-bottom:14px}
+.preset-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px}
+.preset-btn{flex:none;padding:10px 12px;background:rgba(255,107,157,.08);border:1.5px solid rgba(255,107,157,.2);border-radius:10px;color:#e0c0cc;font-size:.75rem;font-weight:600;cursor:pointer;text-align:left;transition:all .2s;line-height:1.4}
+.preset-btn:hover{background:rgba(255,107,157,.18);border-color:#ff6b9d;color:#fff;transform:translateY(-1px)}
+.preset-btn .ptitle{color:#ff6b9d;font-size:.82rem;display:block;margin-bottom:2px}
+.preset-btn .pinfo{color:#888;font-size:.7rem}
 
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #0f0f1e 0%, #1a1a2e 50%, #16213e 100%);
-            color: #e0e0e0;
-            padding: 20px;
-            min-height: 100vh;
-        }
+/* MODE TABS */
+.mode-tabs{display:flex;gap:8px;margin-bottom:20px}
+.tab{flex:1;padding:11px;border-radius:10px;border:1.5px solid rgba(74,158,255,.25);background:rgba(50,50,80,.3);color:#888;font-size:.85rem;font-weight:600;cursor:pointer;text-align:center;transition:all .2s}
+.tab.active{background:rgba(74,158,255,.2);border-color:#4a9eff;color:#4a9eff}
 
-        .container {
-            max-width: 1500px;
-            margin: 0 auto;
-        }
+/* DUAL SIM */
+.dual-wrap{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.algo-panel{background:rgba(30,30,50,.65);border-radius:14px;padding:18px;border-top:3px solid #4a9eff}
+.algo-panel.b{border-top-color:#ff6b9d}
+.algo-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.algo-name{font-size:1rem;font-weight:700}
+.algo-clock{font-size:.8rem;color:#888;background:rgba(50,50,80,.5);padding:4px 10px;border-radius:20px}
+.status-dot{width:9px;height:9px;border-radius:50%;background:#444;display:inline-block;margin-right:6px}
+.status-dot.running{background:#4fffe6;animation:pulse 1s infinite}
+.status-dot.done{background:#4aff7f}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.proc-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.pid{width:30px;font-weight:700;font-size:.8rem;text-align:right;flex-shrink:0}
+.barwrap{flex:1;background:rgba(50,50,80,.5);border-radius:5px;height:28px;overflow:hidden;position:relative}
+.barfill{height:100%;border-radius:5px;transition:width .1s linear;display:flex;align-items:center;padding:0 7px;font-size:.73rem;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;min-width:0}
+.pmeta{font-size:.72rem;min-width:76px;color:#777}
+.pmeta strong{color:#ccc}
+.badge{padding:3px 8px;border-radius:12px;font-size:.68rem;font-weight:700;min-width:52px;text-align:center}
+.badge.on{background:rgba(74,158,255,.2);color:#4a9eff;border:1px solid #4a9eff}
+.badge.wait{background:rgba(255,200,80,.1);color:#ffc850;border:1px solid rgba(255,200,80,.3)}
+.badge.done2{background:rgba(79,255,198,.1);color:#4fffe6;border:1px solid rgba(79,255,198,.3)}
+.badge.idle{background:rgba(120,120,120,.12);color:#666;border:1px solid #333}
 
-        header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
+/* VERDICT */
+.verdict{background:rgba(20,20,40,.8);border:1.5px solid rgba(74,158,255,.25);border-radius:16px;padding:22px;margin-bottom:24px}
+.verdict h2{color:#4fffe6;font-size:1.1rem;margin-bottom:16px;text-align:center}
+.verdict-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:16px}
+.vcard{background:rgba(50,50,80,.4);border-radius:10px;padding:12px;text-align:center}
+.vcard .vlabel{font-size:.68rem;color:#777;text-transform:uppercase;margin-bottom:6px}
+.vcard .winner{font-size:.85rem;font-weight:700;margin-bottom:2px}
+.vcard .vals{font-size:.72rem;color:#888}
+.winner-a{color:#4a9eff}
+.winner-b{color:#ff6b9d}
+.winner-tie{color:#ffc850}
+.verdict-bar{margin-top:14px}
+.vb-label{font-size:.75rem;color:#888;margin-bottom:5px}
+.vb-track{display:flex;height:22px;border-radius:6px;overflow:hidden;gap:2px}
+.vb-a{background:#4a9eff;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:#fff;transition:width .6s ease}
+.vb-b{background:#ff6b9d;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:#fff;transition:width .6s ease}
+.overall-box{margin-top:16px;padding:14px;border-radius:10px;text-align:center;font-size:.9rem;font-weight:600}
+.overall-box.oa{background:rgba(74,158,255,.12);border:1.5px solid rgba(74,158,255,.4);color:#4a9eff}
+.overall-box.ob{background:rgba(255,107,157,.12);border:1.5px solid rgba(255,107,157,.4);color:#ff6b9d}
+.overall-box.ot{background:rgba(255,200,80,.1);border:1.5px solid rgba(255,200,80,.3);color:#ffc850}
 
-        h1 {
-            font-size: 2.5rem;
-            background: linear-gradient(135deg, #4a9eff 0%, #4fffe6 50%, #ff6b9d 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            font-weight: 700;
-        }
+/* METRICS */
+.mrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:18px}
+.mc{background:rgba(74,158,255,.1);border:1.5px solid rgba(74,158,255,.15);padding:13px;border-radius:10px;text-align:center}
+.mclabel{font-size:.68rem;color:#888;text-transform:uppercase;margin-bottom:6px}
+.mcval{font-size:1.4rem;font-weight:700;color:#4fffe6}
 
-        .subtitle {
-            color: #a0a0b0;
-            font-size: 1rem;
-        }
+/* GANTT */
+.gcont{background:rgba(50,50,80,.35);padding:14px;border-radius:10px;overflow-x:auto;margin-bottom:14px}
+.grow{display:flex;align-items:center;margin-bottom:11px;gap:9px}
+.glabel{width:38px;font-weight:700;color:#4a9eff;font-size:.78rem;text-align:right;flex-shrink:0}
+.gtl{flex:1;position:relative;height:30px;background:rgba(50,50,80,.5);border-radius:5px;overflow:hidden;min-width:400px}
+.gb{position:absolute;height:100%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.72rem;border-radius:3px;border-right:1px solid rgba(0,0,0,.3)}
+.gb.fcfs{background:#4a9eff}.gb.sjf{background:#ff9f4a}.gb.priority{background:#9f4aff}.gb.rr{background:#7fd3ff;color:#111}.gb.energy{background:#4aff7f;color:#111}
+.tmarks{position:relative;height:18px;min-width:400px}
+.tm{position:absolute;font-size:.63rem;color:#666;transform:translateX(-50%)}
 
-        .main-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 24px;
-            margin-bottom: 30px;
-        }
+/* TABLE */
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.8rem}
+th,td{padding:8px 10px;text-align:left;border-bottom:1px solid rgba(74,158,255,.15)}
+th{color:#4a9eff;background:rgba(74,158,255,.07)}
 
-        .panel {
-            background: rgba(30, 30, 50, 0.6);
-            border: 2px solid rgba(74, 158, 255, 0.2);
-            border-radius: 16px;
-            padding: 28px;
-            backdrop-filter: blur(10px);
-        }
+.note-box{background:rgba(255,200,80,.07);border:1px solid rgba(255,200,80,.25);border-radius:8px;padding:10px 14px;font-size:.78rem;color:#c8b060;margin-bottom:14px}
 
-        .panel h2 {
-            color: #4a9eff;
-            font-size: 1.4rem;
-            margin-bottom: 20px;
-        }
-
-        .form-group {
-            margin-bottom: 16px;
-        }
-
-        .form-group label {
-            display: block;
-            color: #b0b0c0;
-            font-size: 0.85rem;
-            margin-bottom: 8px;
-        }
-
-        input, select {
-            width: 100%;
-            padding: 12px 16px;
-            background: rgba(50, 50, 80, 0.6);
-            color: #fff;
-            border: 2px solid rgba(74, 158, 255, 0.2);
-            border-radius: 8px;
-            font-size: 0.95rem;
-        }
-
-        .button-group {
-            display: flex;
-            gap: 12px;
-            margin-top: 20px;
-        }
-
-        button {
-            flex: 1;
-            padding: 14px 20px;
-            background: linear-gradient(135deg, #4a9eff 0%, #2b7fd9 100%);
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 24px rgba(74, 158, 255, 0.4);
-        }
-
-        button.secondary {
-            background: rgba(74, 158, 255, 0.15);
-            border: 2px solid rgba(74, 158, 255, 0.4);
-            color: #4a9eff;
-        }
-
-        .process-list {
-            max-height: 240px;
-            overflow-y: auto;
-            margin: 16px 0;
-            padding: 12px;
-            background: rgba(50, 50, 80, 0.3);
-            border-radius: 8px;
-        }
-
-        .process-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: linear-gradient(135deg, rgba(74, 158, 255, 0.15) 0%, rgba(79, 255, 198, 0.05) 100%);
-            padding: 12px;
-            margin-bottom: 8px;
-            border-radius: 8px;
-            border-left: 4px solid #4a9eff;
-        }
-
-        .process-item button {
-            padding: 6px 12px;
-            font-size: 0.8rem;
-            background: rgba(220, 100, 100, 0.6);
-            flex: 0 0 auto;
-        }
-
-        .results-section {
-            display: none;
-            animation: fadeIn 0.6s ease-out;
-        }
-
-        .results-section.visible {
-            display: block;
-        }
-
-        .full-width {
-            grid-column: 1 / -1;
-        }
-
-        .gantt-container {
-            background: rgba(50, 50, 80, 0.4);
-            padding: 20px;
-            border-radius: 12px;
-            overflow-x: auto;
-            margin-bottom: 20px;
-        }
-
-        .gantt-row {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-            gap: 12px;
-        }
-
-        .process-label {
-            width: 50px;
-            font-weight: 700;
-            color: #4a9eff;
-        }
-
-        .gantt-timeline {
-            flex: 1;
-            position: relative;
-            height: 40px;
-            background: rgba(50, 50, 80, 0.5);
-            border-radius: 6px;
-            overflow: hidden;
-        }
-
-        .gantt-block {
-            position: absolute;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
-            font-weight: 700;
-            font-size: 0.85rem;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        .gantt-block.fcfs { background: linear-gradient(135deg, #4a9eff, #3a8eef); }
-        .gantt-block.rr { background: linear-gradient(135deg, #7fd3ff, #5ab8ff); }
-        .gantt-block.sjf { background: linear-gradient(135deg, #ff9f4a, #ff8a2b); }
-        .gantt-block.priority { background: linear-gradient(135deg, #9f4aff, #8a2bff); }
-        .gantt-block.energy { background: linear-gradient(135deg, #4aff7f, #2be560); }
-
-        .timeline-marks {
-            position: relative;
-            height: 25px;
-            margin-top: 5px;
-        }
-
-        .timeline-mark {
-            position: absolute;
-            font-size: 10px;
-            color: #888;
-            transform: translateX(-50%);
-        }
-
-        .metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-
-        .metric {
-            background: linear-gradient(135deg, rgba(74, 158, 255, 0.15) 0%, rgba(79, 255, 198, 0.05) 100%);
-            border: 2px solid rgba(74, 158, 255, 0.2);
-            padding: 20px;
-            border-radius: 12px;
-            text-align: center;
-        }
-
-        .metric-label {
-            color: #a0a0b0;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            margin-bottom: 12px;
-        }
-
-        .metric-value {
-            color: #4fffe6;
-            font-size: 2rem;
-            font-weight: 700;
-        }
-
-        .comparison-table {
-            margin-top: 20px;
-        }
-
-        .comparison-table table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .comparison-table th {
-            background: linear-gradient(135deg, rgba(74, 158, 255, 0.3), rgba(79, 255, 198, 0.1));
-            padding: 12px;
-            text-align: center;
-        }
-
-        .comparison-table td {
-            padding: 10px;
-            text-align: center;
-            border-bottom: 1px solid rgba(74, 158, 255, 0.2);
-        }
-
-        .best-performer {
-            background: rgba(79, 255, 198, 0.15);
-            border: 1px solid #4fffe6;
-        }
-
-        .table-container {
-            overflow-x: auto;
-            margin-bottom: 20px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th, td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid rgba(74, 158, 255, 0.2);
-        }
-
-        th {
-            color: #4a9eff;
-            background: rgba(74, 158, 255, 0.1);
-        }
-
-        .empty-state {
-            text-align: center;
-            color: #808090;
-            padding: 24px;
-        }
-
-        .config-box {
-            background: linear-gradient(135deg, rgba(79, 255, 198, 0.1) 0%, rgba(74, 158, 255, 0.05) 100%);
-            padding: 14px;
-            border-radius: 8px;
-            margin-bottom: 12px;
-            border-left: 4px solid #4fffe6;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-    </style>
+@media(max-width:860px){
+.grid2,.dual-wrap{grid-template-columns:1fr}
+.verdict-grid{grid-template-columns:repeat(3,1fr)}
+.preset-grid{grid-template-columns:1fr 1fr}
+}
+</style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>CPU SCHEDULER SIMULATOR</h1>
-            <p class="subtitle">Complete Energy Comparison - All Algorithms Calculate Energy</p>
-        </header>
+<div class="wrap">
+<header>
+  <h1>CPU Scheduler Simulator</h1>
+  <p class="sub">Single algorithm · Compare two head-to-head · Compare all five · 10 demo presets</p>
+</header>
 
-        <div class="main-grid">
-            <div class="panel">
-                <h2>Add Processes</h2>
-                <div class="form-group">
-                    <label>Process ID</label>
-                    <input type="text" id="processId" placeholder="P1, P2, P3...">
-                </div>
-                <div class="form-group">
-                    <label>Arrival Time (seconds)</label>
-                    <input type="number" id="arrivalTime" value="0" min="0">
-                </div>
-                <div class="form-group">
-                    <label>Burst Time (seconds)</label>
-                    <input type="number" id="burstTime" value="4" min="1">
-                </div>
-                <div class="form-group">
-                    <label>Priority (0=highest, for Priority algorithm)</label>
-                    <input type="number" id="priority" value="0" min="0">
-                </div>
-                <button onclick="addProcess()">Add Process</button>
-                <div class="process-list" id="processList">
-                    <div class="empty-state">No processes yet</div>
-                </div>
-                <div class="button-group">
-                    <button onclick="runSimulation()">Simulate</button>
-                    <button class="secondary" onclick="resetAll()">Reset</button>
-                </div>
-            </div>
+<!-- PRESETS -->
+<div class="presets-panel">
+  <h2>⚡ Demo Presets</h2>
+  <p class="preset-desc">Load a ready-made scenario to instantly see how algorithms behave differently. Each preset is designed to highlight distinct scheduling characteristics.</p>
+  <div class="preset-grid" id="presetGrid"></div>
+</div>
 
-            <div class="panel">
-                <h2>Configuration</h2>
-                <div id="configInfo" class="config-box">
-                    Select an algorithm from dropdown and click Simulate
-                </div>
-                
-                <div class="form-group">
-                    <label>Time Quantum (seconds) - for Round Robin Algorithm</label>
-                    <input type="number" id="quantumValue" value="4" min="1">
-                </div>
-                
-                <div class="form-group">
-                    <label>Select Algorithm</label>
-                    <select id="algorithmSelect">
-                        <option value="fcfs">FCFS (First Come First Served)</option>
-                        <option value="sjf">SJF (Shortest Job First)</option>
-                        <option value="priority">Priority Scheduling (0=Highest)</option>
-                        <option value="rr">Round Robin</option>
-                        <option value="energy">Energy-Aware Scheduling</option>
-                        <option value="compare">COMPARE ALL ALGORITHMS</option>
-                    </select>
-                </div>
-            </div>
-        </div>
+<div class="mode-tabs">
+  <div class="tab active" onclick="setMode('single',this)">Single Algorithm</div>
+  <div class="tab" onclick="setMode('dual',this)">Compare Two</div>
+  <div class="tab" onclick="setMode('all',this)">Compare All</div>
+</div>
 
-        <div id="resultsSection" class="results-section">
-            <div class="panel full-width">
-                <h2>Gantt Chart</h2>
-                <div class="gantt-container" id="ganttChart"></div>
-            </div>
-
-            <div class="metrics-grid" id="metricsGrid"></div>
-
-            <div class="panel full-width">
-                <h2>Process Details</h2>
-                <div class="table-container">
-                    <table id="detailsTable">
-                        <thead id="tableHeader"></thead>
-                        <tbody id="tableBody"></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <div id="comparisonSection" class="results-section">
-            <div class="panel full-width comparison-table">
-                <h2>All Algorithms Comparison (All Calculate Energy)</h2>
-                <div id="comparisonContent"></div>
-            </div>
-        </div>
+<div class="grid2">
+  <div class="panel">
+    <h2>Add Processes</h2>
+    <div class="fg"><label>Process ID</label><input id="pid" placeholder="P1, P2..."></div>
+    <div class="fg"><label>Arrival Time (s)</label><input id="arr" type="number" value="0" min="0"></div>
+    <div class="fg"><label>Burst Time (s)</label><input id="bst" type="number" value="4" min="1"></div>
+    <div class="fg"><label>Priority (lower = higher priority)</label><input id="pri" type="number" value="2" min="0"></div>
+    <button onclick="addProc()">+ Add Process</button>
+    <div class="plist" id="plist"><div style="text-align:center;color:#444;padding:14px;font-size:.82rem">No processes yet — add one above or load a preset</div></div>
+    <div class="btn-row">
+      <button id="runBtn" onclick="runMain()">▶ Simulate</button>
+      <button class="danger" onclick="resetAll()">Reset</button>
     </div>
+  </div>
 
-    <script>
-        let processes = [];
+  <div class="panel">
+    <h2>Configuration</h2>
+    <div class="cfgbox" id="cfgbox">Choose a mode above and select algorithm(s)</div>
+    <div class="fg"><label>Time Quantum (s) — Round Robin only</label><input id="quantum" type="number" value="3" min="1"></div>
+    <div class="fg"><label>Simulation Speed</label>
+      <select id="speed">
+        <option value="1000">Slow (1x)</option>
+        <option value="500" selected>Normal (2x)</option>
+        <option value="200">Fast (5x)</option>
+        <option value="50">Very Fast (20x)</option>
+      </select>
+    </div>
+    <div id="algoSingle" class="fg">
+      <label>Algorithm</label>
+      <select id="algoA" onchange="updateCfg()">
+        <option value="fcfs">FCFS — First Come First Served</option>
+        <option value="sjf">SJF — Shortest Job First (Non-preemptive)</option>
+        <option value="srtf">SRTF — Shortest Remaining Time First (Preemptive)</option>
+        <option value="priority">Priority — Non-preemptive</option>
+        <option value="rr">Round Robin</option>
+        <option value="energy">Energy-Aware</option>
+      </select>
+    </div>
+    <div id="algoDual" style="display:none">
+      <div class="fg"><label>Algorithm A <span style="color:#4a9eff">(Blue)</span></label>
+        <select id="algoA2" onchange="updateCfg()">
+          <option value="fcfs">FCFS</option>
+          <option value="sjf">SJF</option>
+          <option value="srtf">SRTF (Preemptive SJF)</option>
+          <option value="priority">Priority</option>
+          <option value="rr">Round Robin</option>
+          <option value="energy">Energy-Aware</option>
+        </select>
+      </div>
+      <div class="fg"><label>Algorithm B <span style="color:#ff6b9d">(Pink)</span></label>
+        <select id="algoB2" onchange="updateCfg()">
+          <option value="fcfs">FCFS</option>
+          <option value="sjf" selected>SJF</option>
+          <option value="srtf">SRTF (Preemptive SJF)</option>
+          <option value="priority">Priority</option>
+          <option value="rr">Round Robin</option>
+          <option value="energy">Energy-Aware</option>
+        </select>
+      </div>
+    </div>
+  </div>
+</div>
 
-        // Function to calculate energy for a process based on its burst time
-        function calculateEnergy(procs) {
-            let totalEnergy = 0;
-            for (let p of procs) {
-                let useHP = p.burst <= 4;
-                let energyRate = useHP ? 5 : 2;
-                totalEnergy += p.burst * energyRate;
-            }
-            return totalEnergy;
+<div id="dualSimSection" style="display:none">
+  <div class="dual-wrap" id="dualPanels"></div>
+</div>
+
+<div id="liveSimSection" style="display:none">
+  <div class="panel full" style="margin-bottom:20px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <h2 style="margin:0">Live Simulation</h2>
+      <div style="display:flex;align-items:center;gap:8px"><span class="status-dot" id="sdot"></span><span id="stxt" style="font-size:.8rem;color:#888">Idle</span></div>
+    </div>
+    <div class="mrow" style="margin-bottom:14px">
+      <div class="mc"><div class="mclabel">Algorithm</div><div class="mcval" id="sAlgo" style="font-size:.95rem">—</div></div>
+      <div class="mc"><div class="mclabel">Time</div><div class="mcval" id="sTime">0s</div></div>
+      <div class="mc"><div class="mclabel">CPU</div><div class="mcval" id="sCPU">—</div></div>
+      <div class="mc"><div class="mclabel">Done</div><div class="mcval" id="sDone">0/0</div></div>
+    </div>
+    <div id="simBars"></div>
+  </div>
+</div>
+
+<div id="verdictSection" style="display:none" class="verdict">
+  <h2>Head-to-Head Verdict</h2>
+  <div class="verdict-grid" id="verdictGrid"></div>
+  <div class="verdict-bar">
+    <div class="vb-label" id="vbLabel"></div>
+    <div class="vb-track"><div class="vb-a" id="vbA" style="width:50%"></div><div class="vb-b" id="vbB" style="width:50%"></div></div>
+  </div>
+  <div class="overall-box" id="overallBox"></div>
+</div>
+
+<div id="resultsSection" style="display:none">
+  <div class="panel full" style="margin-bottom:20px">
+    <h2>Gantt Chart</h2>
+    <div class="gcont" id="ganttChart"></div>
+  </div>
+  <div class="mrow" id="metricsRow"></div>
+  <div class="panel full">
+    <h2>Process Details</h2>
+    <div class="tbl-wrap"><table><thead id="tHead"></thead><tbody id="tBody"></tbody></table></div>
+  </div>
+</div>
+
+<div id="compareAllSection" style="display:none">
+  <div class="panel full">
+    <h2>All Algorithms Comparison</h2>
+    <div id="compareAllContent"></div>
+  </div>
+</div>
+</div>
+
+<script>
+// ── PRESETS ─────────────────────────────────────────────────────────────────
+const PRESETS = [
+  {
+    title: "Equal Burst — FCFS Shines",
+    desc: "5 processes, same burst. All algos identical here.",
+    info: "5 procs · burst=4 · arr=0,1,2,3,4",
+    procs: [
+      {id:'P1',arrival:0,burst:4,priority:2},
+      {id:'P2',arrival:1,burst:4,priority:1},
+      {id:'P3',arrival:2,burst:4,priority:3},
+      {id:'P4',arrival:3,burst:4,priority:2},
+      {id:'P5',arrival:4,burst:4,priority:1},
+    ]
+  },
+  {
+    title: "Short Jobs Arrive Late — SJF Wins",
+    desc: "Long job arrives first; SJF waits and picks short ones.",
+    info: "6 procs · mixed burst · staggered arrival",
+    procs: [
+      {id:'P1',arrival:0,burst:12,priority:2},
+      {id:'P2',arrival:2,burst:2,priority:3},
+      {id:'P3',arrival:3,burst:1,priority:1},
+      {id:'P4',arrival:4,burst:3,priority:2},
+      {id:'P5',arrival:5,burst:2,priority:3},
+      {id:'P6',arrival:6,burst:5,priority:1},
+    ]
+  },
+  {
+    title: "Priority vs FCFS — Starvation Risk",
+    desc: "High-priority process starves low-priority one.",
+    info: "5 procs · varied priority · mixed burst",
+    procs: [
+      {id:'P1',arrival:0,burst:8,priority:3},
+      {id:'P2',arrival:1,burst:4,priority:0},
+      {id:'P3',arrival:2,burst:6,priority:1},
+      {id:'P4',arrival:3,burst:2,priority:0},
+      {id:'P5',arrival:4,burst:10,priority:4},
+    ]
+  },
+  {
+    title: "Round Robin Fairness Demo",
+    desc: "RR gives each process CPU time slices — great for interactive.",
+    info: "4 procs · long burst · quantum=3",
+    procs: [
+      {id:'P1',arrival:0,burst:10,priority:2},
+      {id:'P2',arrival:0,burst:8,priority:1},
+      {id:'P3',arrival:1,burst:6,priority:3},
+      {id:'P4',arrival:2,burst:4,priority:2},
+    ]
+  },
+  {
+    title: "Convoy Effect — FCFS Worst Case",
+    desc: "One huge job blocks all short jobs behind it.",
+    info: "5 procs · 1 giant + 4 tiny",
+    procs: [
+      {id:'P1',arrival:0,burst:20,priority:2},
+      {id:'P2',arrival:1,burst:2,priority:1},
+      {id:'P3',arrival:1,burst:1,priority:2},
+      {id:'P4',arrival:2,burst:2,priority:1},
+      {id:'P5',arrival:3,burst:1,priority:3},
+    ]
+  },
+  {
+    title: "All Arrive at Once — Priority Sorting",
+    desc: "All processes arrive at t=0, priority decides order.",
+    info: "6 procs · arrival=0 · varied priority",
+    procs: [
+      {id:'P1',arrival:0,burst:5,priority:3},
+      {id:'P2',arrival:0,burst:3,priority:0},
+      {id:'P3',arrival:0,burst:8,priority:2},
+      {id:'P4',arrival:0,burst:2,priority:1},
+      {id:'P5',arrival:0,burst:6,priority:4},
+      {id:'P6',arrival:0,burst:4,priority:0},
+    ]
+  },
+  {
+    title: "Energy Saving — Short vs Long",
+    desc: "Mix of short (HP mode) and long (LP mode) bursts.",
+    info: "6 procs · burst 1–12 · energy demo",
+    procs: [
+      {id:'P1',arrival:0,burst:2,priority:1},
+      {id:'P2',arrival:1,burst:8,priority:2},
+      {id:'P3',arrival:2,burst:3,priority:3},
+      {id:'P4',arrival:3,burst:10,priority:1},
+      {id:'P5',arrival:4,burst:1,priority:2},
+      {id:'P6',arrival:5,burst:12,priority:3},
+    ]
+  },
+  {
+    title: "Bursty Arrivals — RR vs SJF",
+    desc: "Processes arrive in waves; tests how algos handle batches.",
+    info: "8 procs · wave arrivals",
+    procs: [
+      {id:'P1',arrival:0,burst:6,priority:2},
+      {id:'P2',arrival:0,burst:4,priority:1},
+      {id:'P3',arrival:5,burst:2,priority:3},
+      {id:'P4',arrival:5,burst:8,priority:1},
+      {id:'P5',arrival:5,burst:3,priority:2},
+      {id:'P6',arrival:10,burst:5,priority:1},
+      {id:'P7',arrival:10,burst:1,priority:3},
+      {id:'P8',arrival:10,burst:7,priority:2},
+    ]
+  },
+  {
+    title: "Skewed Priorities — Clear Winner",
+    desc: "Priority scheduling dominates with clear tier separation.",
+    info: "6 procs · 3 tiers of priority",
+    procs: [
+      {id:'P1',arrival:0,burst:7,priority:5},
+      {id:'P2',arrival:1,burst:4,priority:0},
+      {id:'P3',arrival:2,burst:5,priority:5},
+      {id:'P4',arrival:3,burst:3,priority:0},
+      {id:'P5',arrival:4,burst:6,priority:3},
+      {id:'P6',arrival:5,burst:2,priority:0},
+    ]
+  },
+  {
+    title: "Real OS Workload Mix",
+    desc: "Simulates a realistic mix: I/O-bound (short) + CPU-bound (long).",
+    info: "8 procs · realistic CPU/IO mix",
+    procs: [
+      {id:'P1',arrival:0,burst:1,priority:1},
+      {id:'P2',arrival:0,burst:12,priority:3},
+      {id:'P3',arrival:2,burst:2,priority:1},
+      {id:'P4',arrival:3,burst:9,priority:2},
+      {id:'P5',arrival:4,burst:1,priority:1},
+      {id:'P6',arrival:6,burst:7,priority:3},
+      {id:'P7',arrival:7,burst:2,priority:1},
+      {id:'P8',arrival:9,burst:5,priority:2},
+    ]
+  }
+];
+
+function buildPresets(){
+  const g=document.getElementById('presetGrid');
+  g.innerHTML=PRESETS.map((p,i)=>`
+    <button class="preset-btn" onclick="loadPreset(${i})">
+      <span class="ptitle">${i+1}. ${p.title}</span>
+      <span style="color:#bbb;font-size:.74rem">${p.desc}</span>
+      <span class="pinfo" style="display:block;margin-top:3px">${p.info}</span>
+    </button>`).join('');
+}
+
+function loadPreset(i){
+  if(simRunning){clearInterval(simTimer);simRunning=false;}
+  hideResults();
+  procs=[...PRESETS[i].procs.map(p=>({...p}))];
+  renderList();
+  document.getElementById('runBtn').disabled=false;
+  // scroll to process list
+  document.querySelector('.grid2').scrollIntoView({behavior:'smooth'});
+}
+
+// ── STATE ───────────────────────────────────────────────────────────────────
+let procs=[], mode='single', simTimer=null, simRunning=false;
+
+const COLORS={fcfs:'#4a9eff',sjf:'#ff9f4a',srtf:'#ff6060',priority:'#9f4aff',rr:'#7fd3ff',energy:'#4aff7f'};
+const NAMES={fcfs:'FCFS',sjf:'SJF',srtf:'SRTF',priority:'Priority',rr:'Round Robin',energy:'Energy-Aware'};
+const DESCS={
+  fcfs:'Non-preemptive. Runs in arrival order. Simple but can cause convoy effect.',
+  sjf:'Non-preemptive. Picks shortest burst from ready queue. Minimises avg wait.',
+  srtf:'Preemptive SJF. Preempts if a shorter job arrives. Optimal avg wait time.',
+  priority:'Non-preemptive. Lower priority number = runs first. Risk of starvation.',
+  rr:'Preemptive. Each process gets a time quantum in rotation. Fair sharing.',
+  energy:'Arrival-order like FCFS but switches CPU power mode based on burst length.',
+};
+
+function setMode(m,el){
+  mode=m;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('algoSingle').style.display=m==='single'?'block':'none';
+  document.getElementById('algoDual').style.display=m==='dual'?'block':'none';
+  hideResults();updateCfg();
+}
+
+function updateCfg(){
+  const a=document.getElementById('algoA').value;
+  const a2=document.getElementById('algoA2').value;
+  const b2=document.getElementById('algoB2').value;
+  if(mode==='single') document.getElementById('cfgbox').textContent=DESCS[a]||'';
+  else if(mode==='dual') document.getElementById('cfgbox').textContent=`Racing ${NAMES[a2]} vs ${NAMES[b2]} side by side in real time.`;
+  else document.getElementById('cfgbox').textContent='Runs all 6 algorithms and compares all metrics side by side.';
+}
+
+function hideResults(){
+  ['liveSimSection','dualSimSection','verdictSection','resultsSection','compareAllSection'].forEach(id=>{
+    document.getElementById(id).style.display='none';
+  });
+}
+
+function addProc(){
+  const id=document.getElementById('pid').value.trim();
+  const arr=parseInt(document.getElementById('arr').value)||0;
+  const bst=parseInt(document.getElementById('bst').value)||0;
+  const pri=parseInt(document.getElementById('pri').value)||0;
+  if(!id||bst<=0){alert('Enter a valid Process ID and burst time > 0');return}
+  if(procs.some(p=>p.id===id)){alert('Process ID already exists');return}
+  procs.push({id,arrival:arr,burst:bst,priority:pri});
+  renderList();
+  document.getElementById('pid').value='';
+  document.getElementById('bst').value='';
+  document.getElementById('arr').value='0';
+  document.getElementById('pri').value='2';
+}
+
+function renderList(){
+  const el=document.getElementById('plist');
+  if(!procs.length){
+    el.innerHTML='<div style="text-align:center;color:#444;padding:14px;font-size:.82rem">No processes yet — add one above or load a preset</div>';
+    return;
+  }
+  el.innerHTML=procs.map((p,i)=>`
+    <div class="pi">
+      <span><strong style="color:#4a9eff">${p.id}</strong> &nbsp;Arr:<strong>${p.arrival}s</strong> &nbsp;Burst:<strong>${p.burst}s</strong> &nbsp;Pri:<strong>${p.priority}</strong></span>
+      <button onclick="removeProc(${i})">✕</button>
+    </div>`).join('');
+}
+
+function removeProc(i){procs.splice(i,1);renderList();}
+
+function resetAll(){
+  if(simTimer)clearInterval(simTimer);
+  simRunning=false;procs=[];renderList();hideResults();
+  document.getElementById('runBtn').disabled=false;
+}
+
+// ── ENERGY ──────────────────────────────────────────────────────────────────
+function calcEnergy(results){
+  return results.reduce((s,r)=>s+r.burst*(r.burst<=4?5:2),0);
+}
+
+// ── SCHEDULING ALGORITHMS ───────────────────────────────────────────────────
+
+// FCFS: sort by arrival, run to completion
+function fcfs(ps){
+  const sorted=[...ps].sort((a,b)=>a.arrival-b.arrival||a.id.localeCompare(b.id));
+  let t=0, tl=[], res=[];
+  for(const p of sorted){
+    if(t<p.arrival) t=p.arrival;
+    const start=t;
+    tl.push({id:p.id,mode:'fcfs',start,end:start+p.burst});
+    res.push({id:p.id,arrival:p.arrival,burst:p.burst,priority:p.priority,
+      start,finish:start+p.burst,
+      waiting:start-p.arrival,
+      turnaround:(start+p.burst)-p.arrival});
+    t+=p.burst;
+  }
+  return{timeline:tl,results:res,totalEnergy:calcEnergy(res)};
+}
+
+// SJF: non-preemptive — at each idle point pick shortest available
+function sjf(ps){
+  const rem=ps.map(p=>({...p,done:false}));
+  let t=0, tl=[], res=[], done=0;
+  while(done<ps.length){
+    const avail=rem.filter(p=>!p.done&&p.arrival<=t);
+    if(!avail.length){
+      // jump to next arrival
+      t=Math.min(...rem.filter(p=>!p.done).map(p=>p.arrival));
+      continue;
+    }
+    // pick shortest burst; tie-break by arrival then id
+    avail.sort((a,b)=>a.burst-b.burst||a.arrival-b.arrival||a.id.localeCompare(b.id));
+    const p=avail[0];
+    const start=t;
+    tl.push({id:p.id,mode:'sjf',start,end:start+p.burst});
+    res.push({id:p.id,arrival:p.arrival,burst:p.burst,priority:p.priority,
+      start,finish:start+p.burst,
+      waiting:start-p.arrival,
+      turnaround:(start+p.burst)-p.arrival});
+    t+=p.burst;
+    p.done=true;done++;
+  }
+  return{timeline:tl,results:res,totalEnergy:calcEnergy(res)};
+}
+
+// SRTF: preemptive SJF — at each tick pick process with shortest remaining time
+function srtf(ps){
+  const rem=ps.map(p=>({...p,remaining:p.burst,started:false,startTime:0,finishTime:0}));
+  const totalTime=ps.reduce((s,p)=>s+p.burst,0)+Math.max(...ps.map(p=>p.arrival));
+  let t=0, tl=[], lastPid=null, segStart=0;
+  const maxT=ps.reduce((s,p)=>Math.max(s,p.arrival),0)+ps.reduce((s,p)=>s+p.burst,0);
+
+  for(let tick=0;tick<=maxT;tick++){
+    const avail=rem.filter(p=>p.arrival<=tick&&p.remaining>0);
+    let cur=null;
+    if(avail.length){
+      avail.sort((a,b)=>a.remaining-b.remaining||a.arrival-b.arrival||a.id.localeCompare(b.id));
+      cur=avail[0];
+    }
+    const curId=cur?cur.id:null;
+    if(curId!==lastPid){
+      if(lastPid!==null) tl.push({id:lastPid,mode:'srtf',start:segStart,end:tick});
+      segStart=tick;lastPid=curId;
+    }
+    if(cur){
+      if(!cur.started){cur.started=true;cur.startTime=tick;}
+      cur.remaining--;
+      if(cur.remaining===0) cur.finishTime=tick+1;
+    }
+  }
+  if(lastPid!==null) tl.push({id:lastPid,mode:'srtf',start:segStart,end:maxT+1});
+  // filter zero-width segments
+  const filteredTl=tl.filter(s=>s.end>s.start);
+  const res=ps.map(p=>{
+    const r=rem.find(x=>x.id===p.id);
+    const finish=r.finishTime;
+    return{id:p.id,arrival:p.arrival,burst:p.burst,priority:p.priority,
+      start:r.startTime,finish,
+      waiting:finish-p.arrival-p.burst,
+      turnaround:finish-p.arrival};
+  });
+  return{timeline:filteredTl,results:res,totalEnergy:calcEnergy(res)};
+}
+
+// PRIORITY: non-preemptive, lower number = higher priority
+function priority(ps){
+  const rem=ps.map(p=>({...p,done:false}));
+  let t=0, tl=[], res=[], done=0;
+  while(done<ps.length){
+    const avail=rem.filter(p=>!p.done&&p.arrival<=t);
+    if(!avail.length){
+      t=Math.min(...rem.filter(p=>!p.done).map(p=>p.arrival));
+      continue;
+    }
+    // lower priority number = runs first; tie-break by arrival then id
+    avail.sort((a,b)=>a.priority-b.priority||a.arrival-b.arrival||a.id.localeCompare(b.id));
+    const p=avail[0];
+    const start=t;
+    tl.push({id:p.id,mode:'priority',start,end:start+p.burst});
+    res.push({id:p.id,arrival:p.arrival,burst:p.burst,priority:p.priority,
+      start,finish:start+p.burst,
+      waiting:start-p.arrival,
+      turnaround:(start+p.burst)-p.arrival});
+    t+=p.burst;
+    p.done=true;done++;
+  }
+  return{timeline:tl,results:res,totalEnergy:calcEnergy(res)};
+}
+
+// ROUND ROBIN: preemptive, time-quantum based
+function rr(ps,q){
+  const rem=ps.map(p=>({...p,remaining:p.burst})).sort((a,b)=>a.arrival-b.arrival||a.id.localeCompare(b.id));
+  let t=0, tl=[], queue=[], idx=0;
+  const startTime={}, finishTime={};
+
+  while(idx<rem.length||queue.length){
+    // enqueue all arrived processes
+    while(idx<rem.length&&rem[idx].arrival<=t){queue.push(rem[idx]);idx++;}
+    if(!queue.length){
+      t=rem[idx].arrival;
+      while(idx<rem.length&&rem[idx].arrival<=t){queue.push(rem[idx]);idx++;}
+    }
+    const p=queue.shift();
+    if(startTime[p.id]===undefined) startTime[p.id]=t;
+    const exec=Math.min(p.remaining,q);
+    tl.push({id:p.id,mode:'rr',start:t,end:t+exec});
+    t+=exec;
+    p.remaining-=exec;
+    // enqueue new arrivals during this slice
+    while(idx<rem.length&&rem[idx].arrival<=t){queue.push(rem[idx]);idx++;}
+    if(p.remaining>0) queue.push(p);
+    else finishTime[p.id]=t;
+  }
+
+  const res=ps.map(p=>({
+    id:p.id,arrival:p.arrival,burst:p.burst,priority:p.priority,
+    start:startTime[p.id],
+    finish:finishTime[p.id],
+    waiting:finishTime[p.id]-p.arrival-p.burst,
+    turnaround:finishTime[p.id]-p.arrival
+  }));
+  return{timeline:tl,results:res,totalEnergy:calcEnergy(res)};
+}
+
+// ENERGY-AWARE: FCFS order but power mode determined by burst length
+function energy(ps){
+  const sorted=[...ps].sort((a,b)=>a.arrival-b.arrival||a.id.localeCompare(b.id));
+  let t=0, tl=[], res=[];
+  for(const p of sorted){
+    if(t<p.arrival) t=p.arrival;
+    const e=p.burst*(p.burst<=4?5:2);
+    const mode_str=p.burst<=4?'HP':'LP';
+    tl.push({id:p.id,mode:'energy',start:t,end:t+p.burst,energyMode:mode_str,energy:e});
+    res.push({id:p.id,arrival:p.arrival,burst:p.burst,priority:p.priority,
+      start:t,finish:t+p.burst,
+      waiting:t-p.arrival,
+      turnaround:(t+p.burst)-p.arrival,
+      energyMode:mode_str,energy:e});
+    t+=p.burst;
+  }
+  return{timeline:tl,results:res,totalEnergy:res.reduce((s,r)=>s+r.energy,0)};
+}
+
+function sched(algo,ps){
+  const q=parseInt(document.getElementById('quantum').value)||3;
+  if(algo==='fcfs') return fcfs(ps);
+  if(algo==='sjf')  return sjf(ps);
+  if(algo==='srtf') return srtf(ps);
+  if(algo==='priority') return priority(ps);
+  if(algo==='rr')   return rr(ps,q);
+  if(algo==='energy') return energy(ps);
+}
+
+// ── LIVE SINGLE SIM ──────────────────────────────────────────────────────────
+function runSingleSim(algo,result,speed){
+  const {timeline,results}=result;
+  const totalTime=Math.max(...results.map(r=>r.finish));
+  const color=COLORS[algo];
+  document.getElementById('liveSimSection').style.display='block';
+  document.getElementById('sAlgo').textContent=NAMES[algo];
+  document.getElementById('sDone').textContent=`0/${procs.length}`;
+  document.getElementById('sdot').className='status-dot running';
+  document.getElementById('stxt').textContent='Running...';
+  document.getElementById('runBtn').disabled=true;
+
+  // Build tick→running map
+  const tickMap={};
+  for(const seg of timeline){
+    for(let t=seg.start;t<seg.end;t++) tickMap[t]=seg.id;
+  }
+
+  const finMap={};for(const r of results)finMap[r.id]=r;
+  const exMap={};for(const p of procs)exMap[p.id]=0;
+  const arrived=new Set();
+
+  document.getElementById('simBars').innerHTML=procs.map(p=>`
+    <div class="proc-row">
+      <div class="pid" style="color:${color}">${p.id}</div>
+      <div class="barwrap">
+        <div class="barfill" id="bf_${p.id}" style="width:0%;background:${color}">
+          <span id="bl_${p.id}"></span>
+        </div>
+      </div>
+      <div class="pmeta">Rem:<strong id="rm_${p.id}">${p.burst}s</strong> W:<strong id="wt_${p.id}">—</strong></div>
+      <div class="badge idle" id="bdg_${p.id}">idle</div>
+    </div>`).join('');
+
+  let tick=0, completed=0;
+  simRunning=true;
+  simTimer=setInterval(()=>{
+    if(tick>totalTime){
+      clearInterval(simTimer);simRunning=false;
+      document.getElementById('sdot').className='status-dot done';
+      document.getElementById('stxt').textContent='Completed!';
+      document.getElementById('runBtn').disabled=false;
+      return;
+    }
+    document.getElementById('sTime').textContent=tick+'s';
+    const running=tickMap[tick]||null;
+    document.getElementById('sCPU').textContent=running||'Idle';
+
+    for(const p of procs){
+      const pid=p.id, r=finMap[pid];
+      if(p.arrival<=tick) arrived.add(pid);
+      const isRun=running===pid;
+      const isDone=r&&tick>=r.finish;
+      if(isRun) exMap[pid]++;
+      const rem=isDone?0:Math.max(0,p.burst-exMap[pid]);
+      const pct=isDone?100:Math.min(100,(exMap[pid]/p.burst)*100);
+      const bf=document.getElementById('bf_'+pid);
+      const bdg=document.getElementById('bdg_'+pid);
+      if(!bf) continue;
+      bf.style.width=pct+'%';
+      document.getElementById('rm_'+pid).textContent=rem+'s';
+      if(isDone){
+        bf.style.background='#4fffe6';
+        document.getElementById('bl_'+pid).textContent=pid+' ✓';
+        bdg.className='badge done2';bdg.textContent='done';
+        document.getElementById('wt_'+pid).textContent=r.waiting.toFixed(1)+'s';
+        if(!exMap[pid+'_c']){exMap[pid+'_c']=true;completed++;}
+      } else if(isRun){
+        bf.style.background=color;
+        document.getElementById('bl_'+pid).textContent=pid+' ('+rem+'s left)';
+        bdg.className='badge on';bdg.textContent='on CPU';
+      } else if(!arrived.has(pid)){
+        bdg.className='badge idle';bdg.textContent='not arrived';
+      } else {
+        document.getElementById('bl_'+pid).textContent=pid+' (waiting)';
+        bdg.className='badge wait';bdg.textContent='waiting';
+      }
+    }
+    document.getElementById('sDone').textContent=completed+'/'+procs.length;
+    tick++;
+  },speed);
+}
+
+// ── DUAL SIM ─────────────────────────────────────────────────────────────────
+function runDualSim(algoA,algoB,rA,rB,speed){
+  document.getElementById('dualSimSection').style.display='block';
+  document.getElementById('runBtn').disabled=true;
+  const configs=[
+    {algo:algoA,result:rA,color:'#4a9eff',side:'a'},
+    {algo:algoB,result:rB,color:'#ff6b9d',side:'b'}
+  ];
+  document.getElementById('dualPanels').innerHTML=configs.map(c=>`
+    <div class="algo-panel ${c.side==='b'?'b':''}" style="border-top-color:${c.color}">
+      <div class="algo-header">
+        <div class="algo-name" style="color:${c.color}"><span class="status-dot" id="dot_${c.side}"></span>${NAMES[c.algo]}</div>
+        <div class="algo-clock" id="clock_${c.side}">0s</div>
+      </div>
+      <div id="dbars_${c.side}">${procs.map(p=>`
+        <div class="proc-row">
+          <div class="pid" style="color:${c.color}">${p.id}</div>
+          <div class="barwrap"><div class="barfill" id="db_${c.side}_${p.id}" style="width:0%;background:${c.color}"><span id="dbl_${c.side}_${p.id}"></span></div></div>
+          <div class="pmeta">R:<strong id="dr_${c.side}_${p.id}">${p.burst}s</strong></div>
+          <div class="badge idle" id="dbdg_${c.side}_${p.id}">idle</div>
+        </div>`).join('')}
+      </div>
+    </div>`).join('');
+
+  const runners=configs.map(c=>{
+    const {timeline,results}=c.result;
+    const totalTime=Math.max(...results.map(r=>r.finish));
+    const tickMap={};
+    for(const seg of timeline) for(let t=seg.start;t<seg.end;t++) tickMap[t]=seg.id;
+    const finMap={};for(const r of results)finMap[r.id]=r;
+    const exMap={};for(const p of procs)exMap[p.id]=0;
+    return{...c,totalTime,tickMap,finMap,exMap,tick:0,done:false,arrived:new Set()};
+  });
+
+  simRunning=true;
+  simTimer=setInterval(()=>{
+    for(const r of runners){
+      if(r.done) continue;
+      if(r.tick>r.totalTime){
+        r.done=true;
+        document.getElementById('dot_'+r.side).className='status-dot done';
+        continue;
+      }
+      document.getElementById('clock_'+r.side).textContent=r.tick+'s';
+      document.getElementById('dot_'+r.side).className='status-dot running';
+      const running=r.tickMap[r.tick]||null;
+      for(const p of procs){
+        const pid=p.id, fm=r.finMap[pid];
+        if(p.arrival<=r.tick) r.arrived.add(pid);
+        const isRun=running===pid;
+        const isDone=fm&&r.tick>=fm.finish;
+        if(isRun) r.exMap[pid]++;
+        const rem=isDone?0:Math.max(0,p.burst-r.exMap[pid]);
+        const pct=isDone?100:Math.min(100,(r.exMap[pid]/p.burst)*100);
+        const bf=document.getElementById('db_'+r.side+'_'+pid);
+        const bdg=document.getElementById('dbdg_'+r.side+'_'+pid);
+        if(!bf) continue;
+        bf.style.width=pct+'%';
+        document.getElementById('dr_'+r.side+'_'+pid).textContent=rem+'s';
+        if(isDone){
+          bf.style.background='#4fffe6';
+          document.getElementById('dbl_'+r.side+'_'+pid).textContent=pid+' ✓';
+          bdg.className='badge done2';bdg.textContent='done';
+        } else if(isRun){
+          document.getElementById('dbl_'+r.side+'_'+pid).textContent=pid+' ('+rem+'s)';
+          bdg.className='badge on';bdg.textContent='on CPU';
+        } else if(!r.arrived.has(pid)){
+          bdg.className='badge idle';bdg.textContent='not arrived';
+        } else {
+          bdg.className='badge wait';bdg.textContent='waiting';
         }
+      }
+      r.tick++;
+    }
+    if(runners.every(r=>r.done)){
+      clearInterval(simTimer);simRunning=false;
+      document.getElementById('runBtn').disabled=false;
+    }
+  },speed);
+}
 
-        function addProcess() {
-            const id = document.getElementById('processId').value.trim();
-            const arrival = parseInt(document.getElementById('arrivalTime').value) || 0;
-            const burst = parseInt(document.getElementById('burstTime').value) || 0;
-            const priority = parseInt(document.getElementById('priority').value) || 0;
+// ── VERDICT ──────────────────────────────────────────────────────────────────
+function showVerdict(algoA,algoB,rA,rB){
+  const avg=(arr,key)=>arr.reduce((s,r)=>s+r[key],0)/arr.length;
+  const maxFinish=r=>Math.max(...r.results.map(x=>x.finish));
 
-            if (!id || burst <= 0) {
-                alert('Please enter valid process ID and burst time');
-                return;
-            }
-            if (processes.some(p => p.id === id)) {
-                alert('Process ID already exists');
-                return;
-            }
-            processes.push({ id, arrival, burst, priority });
-            updateProcessList();
-            document.getElementById('processId').value = '';
-            document.getElementById('arrivalTime').value = '0';
-            document.getElementById('burstTime').value = '';
-            document.getElementById('priority').value = '0';
-        }
+  const tA=maxFinish(rA), tB=maxFinish(rB);
+  const wA=avg(rA.results,'waiting'), wB=avg(rB.results,'waiting');
+  const taA=avg(rA.results,'turnaround'), taB=avg(rB.results,'turnaround');
+  const ctA=rA.timeline.length, ctB=rB.timeline.length;
+  const eA=rA.totalEnergy, eB=rB.totalEnergy;
+  const nA=NAMES[algoA], nB=NAMES[algoB];
 
-        function updateProcessList() {
-            const list = document.getElementById('processList');
-            if (processes.length === 0) {
-                list.innerHTML = '<div class="empty-state">No processes yet</div>';
-                return;
-            }
-            list.innerHTML = processes.map((p, i) => `
-                <div class="process-item">
-                    <span><strong>${p.id}</strong> | Arrival: ${p.arrival}s | Burst: ${p.burst}s | Priority: ${p.priority}</span>
-                    <button onclick="removeProcess(${i})">Remove</button>
-                </div>
-            `).join('');
-        }
+  function winner(vA,vB){
+    if(vA<vB) return{w:'a',cls:'winner-a'};
+    if(vB<vA) return{w:'b',cls:'winner-b'};
+    return{w:'tie',cls:'winner-tie'};
+  }
 
-        function removeProcess(i) {
-            processes.splice(i, 1);
-            updateProcessList();
-        }
+  const cats=[
+    {label:'Total Time',vA:tA.toFixed(2)+'s',vB:tB.toFixed(2)+'s',w:winner(tA,tB)},
+    {label:'Avg Waiting',vA:wA.toFixed(2)+'s',vB:wB.toFixed(2)+'s',w:winner(wA,wB)},
+    {label:'Avg Turnaround',vA:taA.toFixed(2)+'s',vB:taB.toFixed(2)+'s',w:winner(taA,taB)},
+    {label:'Context Switches',vA:ctA,vB:ctB,w:winner(ctA,ctB)},
+    {label:'Energy Used',vA:eA.toFixed(1)+'u',vB:eB.toFixed(1)+'u',w:winner(eA,eB)},
+  ];
 
-        function updateAlgorithmInfo() {
-            const algo = document.getElementById('algorithmSelect').value;
-            
-            let info = '';
-            if (algo === 'fcfs') info = 'First Come First Served - Processes executed in arrival order.';
-            else if (algo === 'sjf') info = 'Shortest Job First - Shortest burst time executes first.';
-            else if (algo === 'priority') info = 'Priority Scheduling - Lower number = Higher priority (0 is highest).';
-            else if (algo === 'rr') info = 'Round Robin - Each process gets a fixed time quantum.';
-            else if (algo === 'energy') info = 'Energy-Aware - Intelligent HP/LP switching to optimize energy.';
-            else if (algo === 'compare') info = 'Compare All Algorithms - Shows all 5 algorithms with energy calculations.';
-            
-            document.getElementById('configInfo').innerHTML = info;
-        }
+  document.getElementById('verdictGrid').innerHTML=cats.map(c=>{
+    const wName=c.w.w==='a'?nA:c.w.w==='b'?nB:'Tie';
+    return`<div class="vcard">
+      <div class="vlabel">${c.label}</div>
+      <div class="winner ${c.w.cls}">${wName}</div>
+      <div class="vals" style="color:#4a9eff">${nA}: ${c.vA}</div>
+      <div class="vals" style="color:#ff6b9d">${nB}: ${c.vB}</div>
+    </div>`;
+  }).join('');
 
-        // Calculate energy for a list of results (same HP/LP logic for all algorithms)
-        function calculateTotalEnergyForResults(results) {
-            let totalEnergy = 0;
-            for (let r of results) {
-                let useHP = r.burst <= 4;
-                let energyRate = useHP ? 5 : 2;
-                totalEnergy += r.burst * energyRate;
-            }
-            return totalEnergy;
-        }
+  const scA=cats.filter(c=>c.w.w==='a').length;
+  const scB=cats.filter(c=>c.w.w==='b').length;
+  const total=cats.length;
+  const pctA=Math.round((scA/total)*100), pctB=100-pctA;
+  document.getElementById('vbLabel').textContent=`Score: ${nA} ${scA} wins vs ${nB} ${scB} wins`;
+  document.getElementById('vbA').style.width=pctA+'%';
+  document.getElementById('vbA').textContent=scA>0?scA:'';
+  document.getElementById('vbB').style.width=pctB+'%';
+  document.getElementById('vbB').textContent=scB>0?scB:'';
+  const ob=document.getElementById('overallBox');
+  if(scA>scB){ob.className='overall-box oa';ob.textContent=`${nA} wins overall with ${scA}/${total} categories`;}
+  else if(scB>scA){ob.className='overall-box ob';ob.textContent=`${nB} wins overall with ${scB}/${total} categories`;}
+  else{ob.className='overall-box ot';ob.textContent=`Dead tie! Both algorithms perform equally overall.`;}
+  document.getElementById('verdictSection').style.display='block';
+}
 
-        // Scheduling Algorithms (ALL now include energy calculation)
-        function scheduleFCFS(procs) {
-            const sorted = [...procs].sort((a, b) => a.arrival - b.arrival);
-            let time = 0, timeline = [], results = [];
-            for (let p of sorted) {
-                if (time < p.arrival) time = p.arrival;
-                timeline.push({ id: p.id, mode: 'fcfs', start: time, end: time + p.burst, duration: p.burst });
-                results.push({ id: p.id, arrival: p.arrival, burst: p.burst, start: time, finish: time + p.burst, waiting: time - p.arrival, turnaround: (time + p.burst) - p.arrival });
-                time += p.burst;
-            }
-            // Add energy calculation
-            let totalEnergy = calculateTotalEnergyForResults(results);
-            return { timeline, results, totalEnergy };
-        }
+// ── DISPLAY RESULTS ──────────────────────────────────────────────────────────
+function displayResults(timeline,results,algo,totalEnergy){
+  const totalTime=Math.max(...results.map(r=>r.finish));
+  const avgW=results.reduce((s,r)=>s+r.waiting,0)/results.length;
+  const avgT=results.reduce((s,r)=>s+r.turnaround,0)/results.length;
+  document.getElementById('metricsRow').innerHTML=`
+    <div class="mc"><div class="mclabel">Total Time</div><div class="mcval">${totalTime.toFixed(2)}s</div></div>
+    <div class="mc"><div class="mclabel">Avg Waiting</div><div class="mcval">${avgW.toFixed(2)}s</div></div>
+    <div class="mc"><div class="mclabel">Avg Turnaround</div><div class="mcval">${avgT.toFixed(2)}s</div></div>
+    <div class="mc"><div class="mclabel">Context Switches</div><div class="mcval">${timeline.length}</div></div>
+    <div class="mc"><div class="mclabel">Energy</div><div class="mcval">${totalEnergy.toFixed(1)}u</div></div>`;
 
-        function scheduleSJF(procs) {
-            let remaining = procs.map(p => ({ ...p, remaining: p.burst, done: false }));
-            let time = 0, timeline = [], results = [], completed = 0;
-            while (completed < procs.length) {
-                let available = remaining.filter(p => p.arrival <= time && !p.done);
-                if (available.length === 0) {
-                    time = Math.min(...remaining.filter(p => !p.done).map(p => p.arrival));
-                    continue;
-                }
-                available.sort((a, b) => a.remaining - b.remaining);
-                let p = available[0];
-                timeline.push({ id: p.id, mode: 'sjf', start: time, end: time + p.remaining, duration: p.remaining });
-                results.push({ id: p.id, arrival: p.arrival, burst: p.burst, start: time, finish: time + p.remaining, waiting: time - p.arrival, turnaround: (time + p.remaining) - p.arrival });
-                time += p.remaining;
-                p.done = true;
-                completed++;
-            }
-            let totalEnergy = calculateTotalEnergyForResults(results);
-            return { timeline, results, totalEnergy };
-        }
+  // Gantt
+  const pm=new Map();
+  timeline.forEach(b=>{if(!pm.has(b.id))pm.set(b.id,[]);pm.get(b.id).push(b);});
+  let gh='';
+  for(const[id,blocks] of pm){
+    let row=`<div class="grow"><div class="glabel">${id}</div><div class="gtl">`;
+    for(const b of blocks){
+      const l=(b.start/totalTime)*100,w=((b.end-b.start)/totalTime)*100;
+      row+=`<div class="gb ${b.mode}" style="left:${l}%;width:${Math.max(w,.5)}%" title="${b.id}: ${b.start}s–${b.end}s">${w>3?b.id:''}</div>`;
+    }
+    row+=`</div></div>`;
+    gh+=row;
+  }
+  const iv=Math.max(1,Math.ceil(totalTime/10));
+  let marks='<div class="tmarks">';
+  for(let i=0;i<=totalTime;i+=iv) marks+=`<div class="tm" style="left:${(i/totalTime)*100}%">${i}s</div>`;
+  document.getElementById('ganttChart').innerHTML=gh+marks+'</div>';
 
-        function schedulePriority(procs) {
-            let remaining = procs.map(p => ({ ...p, remaining: p.burst, done: false }));
-            let time = 0, timeline = [], results = [], completed = 0;
-            while (completed < procs.length) {
-                let available = remaining.filter(p => p.arrival <= time && !p.done);
-                if (available.length === 0) {
-                    time = Math.min(...remaining.filter(p => !p.done).map(p => p.arrival));
-                    continue;
-                }
-                available.sort((a, b) => a.priority - b.priority);
-                let p = available[0];
-                timeline.push({ id: p.id, mode: 'priority', start: time, end: time + p.remaining, duration: p.remaining });
-                results.push({ id: p.id, arrival: p.arrival, burst: p.burst, priority: p.priority, start: time, finish: time + p.remaining, waiting: time - p.arrival, turnaround: (time + p.remaining) - p.arrival });
-                time += p.remaining;
-                p.done = true;
-                completed++;
-            }
-            let totalEnergy = calculateTotalEnergyForResults(results);
-            return { timeline, results, totalEnergy };
-        }
+  // Table
+  const hasPriority=algo==='priority';
+  const hasEnergy=algo==='energy';
+  const hdrs=['P','Arrival','Burst'];
+  if(hasPriority) hdrs.push('Priority');
+  hdrs.push('Start','Finish','Wait','Turnaround');
+  if(hasEnergy) hdrs.push('Mode','Energy');
+  document.getElementById('tHead').innerHTML=`<tr>${hdrs.map(h=>`<th>${h}</th>`).join('')}</tr>`;
+  document.getElementById('tBody').innerHTML=results.map(r=>{
+    let c=[r.id,r.arrival,r.burst];
+    if(hasPriority) c.push(r.priority);
+    c.push(r.start.toFixed(2),r.finish.toFixed(2),r.waiting.toFixed(2),r.turnaround.toFixed(2));
+    if(hasEnergy) c.push(r.energyMode||'—', (r.energy||0).toFixed(2));
+    return`<tr>${c.map(x=>`<td>${x}</td>`).join('')}</tr>`;
+  }).join('');
+  document.getElementById('resultsSection').style.display='block';
+}
 
-        function scheduleRoundRobin(procs, quantum) {
-            let remaining = procs.map(p => ({ id: p.id, arrival: p.arrival, burst: p.burst, remaining: p.burst }));
-            remaining.sort((a, b) => a.arrival - b.arrival);
-            let time = 0, timeline = [], queue = [], idx = 0, startTimes = {}, finishTimes = {};
-            
-            while (idx < remaining.length || queue.length > 0) {
-                while (idx < remaining.length && remaining[idx].arrival <= time) {
-                    queue.push(remaining[idx]);
-                    idx++;
-                }
-                if (queue.length === 0 && idx < remaining.length) {
-                    time = remaining[idx].arrival;
-                    continue;
-                }
-                let p = queue.shift();
-                if (startTimes[p.id] === undefined) startTimes[p.id] = time;
-                let exec = Math.min(p.remaining, quantum);
-                timeline.push({ id: p.id, mode: 'rr', start: time, end: time + exec, duration: exec });
-                time += exec;
-                p.remaining -= exec;
-                while (idx < remaining.length && remaining[idx].arrival <= time) {
-                    queue.push(remaining[idx]);
-                    idx++;
-                }
-                if (p.remaining > 0) {
-                    queue.push(p);
-                } else {
-                    finishTimes[p.id] = time;
-                }
-            }
-            
-            let results = [];
-            for (let p of procs) {
-                let turnaround = finishTimes[p.id] - p.arrival;
-                let waiting = turnaround - p.burst;
-                results.push({ id: p.id, arrival: p.arrival, burst: p.burst, start: startTimes[p.id], finish: finishTimes[p.id], waiting: waiting, turnaround: turnaround });
-            }
-            let totalEnergy = calculateTotalEnergyForResults(results);
-            return { timeline, results, totalEnergy };
-        }
+// ── COMPARE ALL ──────────────────────────────────────────────────────────────
+function compareAll(){
+  const q=parseInt(document.getElementById('quantum').value)||3;
+  const runs=[
+    {name:'FCFS',key:'fcfs',res:fcfs(procs)},
+    {name:'SJF',key:'sjf',res:sjf(procs)},
+    {name:'SRTF',key:'srtf',res:srtf(procs)},
+    {name:'Priority',key:'priority',res:priority(procs)},
+    {name:`RR (q=${q})`,key:'rr',res:rr(procs,q)},
+    {name:'Energy',key:'energy',res:energy(procs)}
+  ];
+  for(const r of runs){
+    r.t=Math.max(...r.res.results.map(x=>x.finish));
+    r.w=r.res.results.reduce((s,x)=>s+x.waiting,0)/r.res.results.length;
+    r.ta=r.res.results.reduce((s,x)=>s+x.turnaround,0)/r.res.results.length;
+    r.e=r.res.totalEnergy;
+    r.ctx=r.res.timeline.length;
+  }
+  const bW=Math.min(...runs.map(r=>r.w));
+  const bTa=Math.min(...runs.map(r=>r.ta));
+  const bT=Math.min(...runs.map(r=>r.t));
+  const bE=Math.min(...runs.map(r=>r.e));
+  const bCtx=Math.min(...runs.map(r=>r.ctx));
 
-        function scheduleEnergyAware(procs) {
-            const sorted = [...procs].sort((a, b) => a.arrival - b.arrival);
-            let time = 0, timeline = [], results = [];
-            for (let p of sorted) {
-                if (time < p.arrival) time = p.arrival;
-                let useHP = p.burst <= 4;
-                let energy = p.burst * (useHP ? 5 : 2);
-                timeline.push({ id: p.id, mode: 'energy', start: time, end: time + p.burst, duration: p.burst, energy: energy });
-                results.push({ id: p.id, arrival: p.arrival, burst: p.burst, start: time, finish: time + p.burst, waiting: time - p.arrival, turnaround: (time + p.burst) - p.arrival, energy: energy });
-                time += p.burst;
-            }
-            let totalEnergy = results.reduce((sum, r) => sum + r.energy, 0);
-            return { timeline, results, totalEnergy };
-        }
+  let html=`<div class="tbl-wrap"><table>
+    <thead><tr><th>Algorithm</th><th>Total Time</th><th>Avg Wait</th><th>Avg Turnaround</th><th>Context Switches</th><th>Energy</th></tr></thead><tbody>`;
+  for(const r of runs){
+    const isBest=r.w===bW||r.ta===bTa||r.t===bT||r.e===bE||r.ctx===bCtx;
+    html+=`<tr style="${isBest?'background:rgba(79,255,198,.09)':''}">
+      <td><strong>${r.name}</strong>${isBest?' 🏆':''}</td>
+      <td style="color:${r.t===bT?'#4fffe6':'#ccc'}">${r.t.toFixed(2)}s${r.t===bT?' ★':''}</td>
+      <td style="color:${r.w===bW?'#4fffe6':'#ccc'}">${r.w.toFixed(2)}s${r.w===bW?' ★':''}</td>
+      <td style="color:${r.ta===bTa?'#4fffe6':'#ccc'}">${r.ta.toFixed(2)}s${r.ta===bTa?' ★':''}</td>
+      <td style="color:${r.ctx===bCtx?'#4fffe6':'#ccc'}">${r.ctx}${r.ctx===bCtx?' ★':''}</td>
+      <td style="color:${r.e===bE?'#4fffe6':'#ccc'}">${r.e.toFixed(1)}u${r.e===bE?' ★':''}</td></tr>`;
+  }
+  html+=`</tbody></table></div>
+  <div style="margin-top:14px;padding:14px;background:rgba(79,255,198,.07);border-radius:10px;border-left:3px solid #4fffe6">
+    <strong style="color:#4fffe6;font-size:.88rem">★ Best in each category:</strong>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-top:10px;font-size:.8rem">
+      <div><span style="color:#888">Fastest Total</span><br><strong style="color:#4fffe6">${runs.find(r=>r.t===bT).name}</strong> (${bT.toFixed(2)}s)</div>
+      <div><span style="color:#888">Lowest Avg Wait</span><br><strong style="color:#4fffe6">${runs.find(r=>r.w===bW).name}</strong> (${bW.toFixed(2)}s)</div>
+      <div><span style="color:#888">Best Turnaround</span><br><strong style="color:#4fffe6">${runs.find(r=>r.ta===bTa).name}</strong> (${bTa.toFixed(2)}s)</div>
+      <div><span style="color:#888">Fewest Switches</span><br><strong style="color:#4fffe6">${runs.find(r=>r.ctx===bCtx).name}</strong> (${bCtx})</div>
+      <div><span style="color:#888">Lowest Energy</span><br><strong style="color:#4fffe6">${runs.find(r=>r.e===bE).name}</strong> (${bE.toFixed(1)}u)</div>
+    </div>
+  </div>`;
+  document.getElementById('compareAllContent').innerHTML=html;
+  document.getElementById('compareAllSection').style.display='block';
+}
 
-        function displayResults(timeline, results, algoName, totalEnergy) {
-            const totalTime = Math.max(...results.map(r => r.finish));
-            const avgWait = results.reduce((s, r) => s + r.waiting, 0) / results.length;
-            const avgTurn = results.reduce((s, r) => s + r.turnaround, 0) / results.length;
+// ── MAIN ─────────────────────────────────────────────────────────────────────
+function runMain(){
+  if(!procs.length){alert('Add at least one process, or load a preset!');return;}
+  if(simRunning){clearInterval(simTimer);simRunning=false;}
+  hideResults();
+  const speed=parseInt(document.getElementById('speed').value)||500;
 
-            let metricsHTML = `
-                <div class="metric"><div class="metric-label">Total Time</div><div class="metric-value">${totalTime.toFixed(2)}s</div></div>
-                <div class="metric"><div class="metric-label">Avg Waiting</div><div class="metric-value">${avgWait.toFixed(2)}s</div></div>
-                <div class="metric"><div class="metric-label">Avg Turnaround</div><div class="metric-value">${avgTurn.toFixed(2)}s</div></div>
-                <div class="metric"><div class="metric-label">Context Switches</div><div class="metric-value">${timeline.length - 1}</div></div>
-                <div class="metric"><div class="metric-label">Total Energy</div><div class="metric-value">${totalEnergy.toFixed(2)} units</div></div>
-            `;
-            document.getElementById('metricsGrid').innerHTML = metricsHTML;
+  if(mode==='all'){compareAll();return;}
 
-            const maxTime = totalTime;
-            let ganttHTML = '';
-            const processMap = new Map();
-            timeline.forEach(item => {
-                if (!processMap.has(item.id)) processMap.set(item.id, []);
-                processMap.get(item.id).push(item);
-            });
-            
-            for (let [id, blocks] of processMap) {
-                let rowHTML = `<div class="gantt-row"><div class="process-label">${id}</div><div class="gantt-timeline">`;
-                for (let block of blocks) {
-                    const left = (block.start / maxTime) * 100;
-                    const width = ((block.end - block.start) / maxTime) * 100;
-                    rowHTML += `<div class="gantt-block ${block.mode}" style="left: ${left}%; width: ${width}%;">${block.id}</div>`;
-                }
-                rowHTML += `</div></div>`;
-                ganttHTML += rowHTML;
-            }
-            
-            let timelineMarks = '<div class="timeline-marks">';
-            let interval = Math.ceil(maxTime / 10);
-            for (let i = 0; i <= maxTime; i += interval) {
-                let pos = (i / maxTime) * 100;
-                timelineMarks += `<div class="timeline-mark" style="left: ${pos}%;">${i}s</div>`;
-            }
-            timelineMarks += '</div>';
-            ganttHTML += timelineMarks;
-            document.getElementById('ganttChart').innerHTML = ganttHTML;
+  if(mode==='dual'){
+    const algoA=document.getElementById('algoA2').value;
+    const algoB=document.getElementById('algoB2').value;
+    if(algoA===algoB){alert('Please pick two different algorithms to compare');return;}
+    const rA=sched(algoA,procs), rB=sched(algoB,procs);
+    const tA=Math.max(...rA.results.map(r=>r.finish));
+    const tB=Math.max(...rB.results.map(r=>r.finish));
+    const totalTime=Math.max(tA,tB);
+    runDualSim(algoA,algoB,rA,rB,speed);
+    setTimeout(()=>{
+      showVerdict(algoA,algoB,rA,rB);
+      document.getElementById('verdictSection').scrollIntoView({behavior:'smooth'});
+    },(totalTime+2)*speed+600);
+    return;
+  }
 
-            let headers = ['Process', 'Arrival', 'Burst', 'Start', 'Finish', 'Waiting', 'Turnaround'];
-            if (algoName === 'priority') headers = ['Process', 'Arrival', 'Burst', 'Priority', 'Start', 'Finish', 'Waiting', 'Turnaround'];
-            if (algoName === 'energy') headers.push('Energy');
-            
-            document.getElementById('tableHeader').innerHTML = `<tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>`;
-            let tableBody = '';
-            for (let r of results) {
-                if (algoName === 'priority') {
-                    tableBody += `<tr>
-                        <td>${r.id}</td>
-                        <td>${r.arrival}</td>
-                        <td>${r.burst}</td>
-                        <td>${r.priority}</td>
-                        <td>${r.start.toFixed(2)}</td>
-                        <td>${r.finish.toFixed(2)}</td>
-                        <td>${r.waiting.toFixed(2)}</td>
-                        <td>${r.turnaround.toFixed(2)}</td>
-                    </tr>`;
-                } else if (algoName === 'energy') {
-                    tableBody += `<tr>
-                        <td>${r.id}</td>
-                        <td>${r.arrival}</td>
-                        <td>${r.burst}</td>
-                        <td>${r.start.toFixed(2)}</td>
-                        <td>${r.finish.toFixed(2)}</td>
-                        <td>${r.waiting.toFixed(2)}</td>
-                        <td>${r.turnaround.toFixed(2)}</td>
-                        <td>${r.energy.toFixed(2)}</td>
-                    </tr>`;
-                } else {
-                    tableBody += `<tr>
-                        <td>${r.id}</td>
-                        <td>${r.arrival}</td>
-                        <td>${r.burst}</td>
-                        <td>${r.start.toFixed(2)}</td>
-                        <td>${r.finish.toFixed(2)}</td>
-                        <td>${r.waiting.toFixed(2)}</td>
-                        <td>${r.turnaround.toFixed(2)}</td>
-                    </tr>`;
-                }
-            }
-            document.getElementById('tableBody').innerHTML = tableBody;
-        }
+  const algo=document.getElementById('algoA').value;
+  const result=sched(algo,procs);
+  const totalTime=Math.max(...result.results.map(r=>r.finish));
+  runSingleSim(algo,result,speed);
+  setTimeout(()=>{
+    displayResults(result.timeline,result.results,algo,result.totalEnergy);
+    document.getElementById('resultsSection').scrollIntoView({behavior:'smooth'});
+  },(totalTime+2)*speed+500);
+}
 
-        function compareAllAlgorithms() {
-            if (processes.length === 0) {
-                alert('Please add at least one process first');
-                return;
-            }
-            
-            const quantum = parseInt(document.getElementById('quantumValue').value) || 4;
-            
-            let fcfsResult = scheduleFCFS(processes);
-            let sjfResult = scheduleSJF(processes);
-            let priorityResult = schedulePriority(processes);
-            let rrResult = scheduleRoundRobin(processes, quantum);
-            let energyResult = scheduleEnergyAware(processes);
-            
-            let comparisonData = [
-                { name: 'FCFS', results: fcfsResult.results, totalEnergy: fcfsResult.totalEnergy },
-                { name: 'SJF', results: sjfResult.results, totalEnergy: sjfResult.totalEnergy },
-                { name: 'Priority', results: priorityResult.results, totalEnergy: priorityResult.totalEnergy },
-                { name: 'Round Robin', results: rrResult.results, totalEnergy: rrResult.totalEnergy },
-                { name: 'Energy-Aware', results: energyResult.results, totalEnergy: energyResult.totalEnergy }
-            ];
-            
-            let bestWait = Infinity, bestTurn = Infinity, bestTime = Infinity, bestEnergy = Infinity;
-            let bestWaitAlgo = '', bestTurnAlgo = '', bestTimeAlgo = '', bestEnergyAlgo = '';
-            
-            for (let data of comparisonData) {
-                let totalTime = Math.max(...data.results.map(r => r.finish));
-                let avgWait = data.results.reduce((s, r) => s + r.waiting, 0) / data.results.length;
-                let avgTurn = data.results.reduce((s, r) => s + r.turnaround, 0) / data.results.length;
-                
-                data.totalTime = totalTime;
-                data.avgWait = avgWait;
-                data.avgTurn = avgTurn;
-                
-                if (avgWait < bestWait) { bestWait = avgWait; bestWaitAlgo = data.name; }
-                if (avgTurn < bestTurn) { bestTurn = avgTurn; bestTurnAlgo = data.name; }
-                if (totalTime < bestTime) { bestTime = totalTime; bestTimeAlgo = data.name; }
-                if (data.totalEnergy < bestEnergy) { bestEnergy = data.totalEnergy; bestEnergyAlgo = data.name; }
-            }
-            
-            let comparisonHTML = `
-                <div class="table-container">
-                    <h3 style="margin-bottom: 15px; color: #4fffe6;">Using Quantum: ${quantum}s for Round Robin | Energy: HP(≤4s)=5u/s, LP(>4s)=2u/s</h3>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Algorithm</th>
-                                <th>Total Time (s)</th>
-                                <th>Avg Waiting (s)</th>
-                                <th>Avg Turnaround (s)</th>
-                                <th>Total Energy (units)</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-            `;
-            
-            for (let data of comparisonData) {
-                let isBestWait = data.name === bestWaitAlgo;
-                let isBestTurn = data.name === bestTurnAlgo;
-                let isBestTime = data.name === bestTimeAlgo;
-                let isBestEnergy = data.name === bestEnergyAlgo;
-                let rowClass = (isBestWait || isBestTurn || isBestTime || isBestEnergy) ? 'class="best-performer"' : '';
-                
-                comparisonHTML += `<tr ${rowClass}>
-                    <td><strong>${data.name}</strong> ${(isBestWait || isBestTurn || isBestTime || isBestEnergy) ? '🏆' : ''}</td>
-                    <td style="color: ${isBestTime ? '#4fffe6' : '#fff'}">${data.totalTime.toFixed(2)}s</td>
-                    <td style="color: ${isBestWait ? '#4fffe6' : '#fff'}">${data.avgWait.toFixed(2)}s</td>
-                    <td style="color: ${isBestTurn ? '#4fffe6' : '#fff'}">${data.avgTurn.toFixed(2)}s</td>
-                    <td style="color: ${isBestEnergy ? '#4fffe6' : '#fff'}">${data.totalEnergy.toFixed(2)} units</td>
-                </tr>`;
-            }
-            
-            comparisonHTML += `
-                        </tbody>
-                    </table>
-                </div>
-                <div style="margin-top: 20px; padding: 20px; background: linear-gradient(135deg, rgba(79, 255, 198, 0.1), rgba(74, 158, 255, 0.05)); border-radius: 12px; border-left: 4px solid #4fffe6;">
-                    <h3 style="color: #4fffe6; margin-bottom: 15px;">Best Performers</h3>
-                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px;">
-                        <div><strong>Fastest Execution:</strong><br><span style="color: #4fffe6; font-size: 1.1rem;">${bestTimeAlgo}</span><br>${bestTime.toFixed(2)}s</div>
-                        <div><strong>Lowest Waiting:</strong><br><span style="color: #4fffe6; font-size: 1.1rem;">${bestWaitAlgo}</span><br>${bestWait.toFixed(2)}s</div>
-                        <div><strong>Best Turnaround:</strong><br><span style="color: #4fffe6; font-size: 1.1rem;">${bestTurnAlgo}</span><br>${bestTurn.toFixed(2)}s</div>
-                        <div><strong>Most Energy Efficient:</strong><br><span style="color: #4fffe6; font-size: 1.1rem;">${bestEnergyAlgo}</span><br>${bestEnergy.toFixed(2)} units</div>
-                    </div>
-                </div>
-            `;
-            
-            document.getElementById('comparisonContent').innerHTML = comparisonHTML;
-            document.getElementById('comparisonSection').classList.add('visible');
-            document.getElementById('resultsSection').classList.remove('visible');
-            document.getElementById('comparisonSection').scrollIntoView({ behavior: 'smooth' });
-        }
-
-        function runSimulation() {
-            if (processes.length === 0) {
-                alert('Please add at least one process');
-                return;
-            }
-            
-            const algo = document.getElementById('algorithmSelect').value;
-            
-            if (algo === 'compare') {
-                compareAllAlgorithms();
-                return;
-            }
-            
-            const quantum = parseInt(document.getElementById('quantumValue').value) || 4;
-            let result;
-            
-            switch(algo) {
-                case 'fcfs': result = scheduleFCFS(processes); break;
-                case 'sjf': result = scheduleSJF(processes); break;
-                case 'priority': result = schedulePriority(processes); break;
-                case 'rr': result = scheduleRoundRobin(processes, quantum); break;
-                case 'energy': result = scheduleEnergyAware(processes); break;
-                default: result = scheduleFCFS(processes);
-            }
-            
-            displayResults(result.timeline, result.results, algo, result.totalEnergy);
-            document.getElementById('resultsSection').classList.add('visible');
-            document.getElementById('comparisonSection').classList.remove('visible');
-        }
-
-        function resetAll() {
-            processes = [];
-            updateProcessList();
-            document.getElementById('resultsSection').classList.remove('visible');
-            document.getElementById('comparisonSection').classList.remove('visible');
-        }
-
-        document.getElementById('algorithmSelect').addEventListener('change', updateAlgorithmInfo);
-        updateAlgorithmInfo();
-    </script>
+document.getElementById('pid').addEventListener('keydown',e=>{if(e.key==='Enter')addProc();});
+buildPresets();
+updateCfg();
+</script>
 </body>
 </html>
