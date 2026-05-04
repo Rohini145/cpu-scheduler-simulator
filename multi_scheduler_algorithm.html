@@ -502,20 +502,67 @@ function hrrn(ps){
   return{timeline:tl,results:res,totalEnergy:calcEnergy(res)};
 }
 
-function energy_sched(ps){
-  const sorted=[...ps].sort((a,b)=>a.arrival-b.arrival||a.id.localeCompare(b.id));
-  let t=0,tl=[],res=[];
-  for(const p of sorted){
-    if(t<p.arrival)t=p.arrival;
-    const e=p.burst*(p.burst<=4?5:2);
-    const ms=p.burst<=4?'HP':'LP';
-    tl.push({id:p.id,mode:'energy',start:t,end:t+p.burst,energyMode:ms,energy:e});
-    res.push({id:p.id,arrival:p.arrival,burst:p.burst,priority:p.priority,
-              start:t,finish:t+p.burst,waiting:t-p.arrival,
-              turnaround:(t+p.burst)-p.arrival,energyMode:ms,energy:e});
-    t+=p.burst;
+function energy_sched(ps) {
+  // Sort by arrival time
+  const sorted = [...ps].sort((a, b) => a.arrival - b.arrival || a.id.localeCompare(b.id));
+  let t = 0;
+  let tl = [];
+  let res = [];
+  
+  for (const p of sorted) {
+    if (t < p.arrival) t = p.arrival;
+    
+    // ENERGY-AWARE DECISION: Choose mode based on slack time
+    // Calculate if we have time to run in LP mode
+    let nextArrival = sorted.find(n => n.arrival > t)?.arrival || Infinity;
+    let slack = nextArrival - t;
+    
+    let useLP = false;
+    let burstTime = p.burst;
+    let energyMode = '';
+    let energy = 0;
+    
+    // If slack > burst * 2, we can use LP mode safely
+    if (slack > p.burst * 2) {
+      useLP = true;
+      burstTime = p.burst * 2; // LP takes 2x time
+      energyMode = 'LP';
+      energy = burstTime * 2; // LP power = 2
+    } else {
+      energyMode = 'HP';
+      energy = burstTime * 5; // HP power = 5
+    }
+    
+    tl.push({
+      id: p.id,
+      mode: 'energy',
+      start: t,
+      end: t + burstTime,
+      energyMode: energyMode,
+      energy: energy
+    });
+    
+    res.push({
+      id: p.id,
+      arrival: p.arrival,
+      burst: p.burst,
+      priority: p.priority,
+      start: t,
+      finish: t + burstTime,
+      waiting: t - p.arrival,
+      turnaround: (t + burstTime) - p.arrival,
+      energyMode: energyMode,
+      energy: energy
+    });
+    
+    t += burstTime;
   }
-  return{timeline:tl,results:res,totalEnergy:res.reduce((s,r)=>s+r.energy,0)};
+  
+  return {
+    timeline: tl,
+    results: res,
+    totalEnergy: res.reduce((s, r) => s + r.energy, 0)
+  };
 }
 
 // ---------- FIXED MLQ with preemptive higher queue ----------
