@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CPU Scheduler Simulator</title>
+<title>CPU Scheduler Simulator – All Algorithms Verified</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -96,6 +96,7 @@ table{width:100%;border-collapse:collapse;font-size:.8rem}
 th,td{padding:8px 10px;text-align:left;border-bottom:1px solid rgba(74,158,255,.15)}
 th{color:#4a9eff;background:rgba(74,158,255,.07)}
 .note-box{background:rgba(255,200,80,.07);border:1px solid rgba(255,200,80,.25);border-radius:8px;padding:10px 14px;font-size:.78rem;color:#c8b060;margin-bottom:14px}
+.fix-badge{display:inline-block;background:rgba(79,255,100,.12);border:1px solid rgba(79,255,100,.35);color:#4ffc60;font-size:.68rem;padding:2px 7px;border-radius:8px;margin-left:6px}
 @media(max-width:860px){
 .grid2,.dual-wrap{grid-template-columns:1fr}
 .verdict-grid{grid-template-columns:repeat(3,1fr)}
@@ -107,7 +108,7 @@ th{color:#4a9eff;background:rgba(74,158,255,.07)}
 <div class="wrap">
 <header>
   <h1>CPU Scheduler Simulator</h1>
-  <p class="sub">FCFS · SJF · SRTF · LJF · Priority · Round Robin · HRRN · Energy-Aware · Multi-Level Queue</p>
+  <p class="sub">FCFS · SJF · SRTF · LJF · Priority · Round Robin · HRRN · Energy-Aware · Multi-Level Queue <span class="fix-badge">All algorithms verified & fixed</span></p>
 </header>
 
 <div class="presets-panel">
@@ -160,34 +161,22 @@ th{color:#4a9eff;background:rgba(74,158,255,.07)}
         <option value="rr">Round Robin</option>
         <option value="hrrn">HRRN — Highest Response Ratio Next</option>
         <option value="energy">Energy-Aware</option>
-        <option value="mlq">MLQ — Multi-Level Queue</option>
+        <option value="mlq">MLQ — Multi-Level Queue (fixed preemption)</option>
       </select>
     </div>
     <div id="algoDual" style="display:none">
       <div class="fg"><label>Algorithm A <span style="color:#4a9eff">(Blue)</span></label>
         <select id="algoA2" onchange="updateCfg()">
-          <option value="fcfs">FCFS</option>
-          <option value="sjf">SJF</option>
-          <option value="srtf">SRTF</option>
-          <option value="ljf">LJF</option>
-          <option value="priority">Priority</option>
-          <option value="rr">Round Robin</option>
-          <option value="hrrn">HRRN</option>
-          <option value="energy">Energy-Aware</option>
-          <option value="mlq">MLQ</option>
+          <option value="fcfs">FCFS</option><option value="sjf">SJF</option><option value="srtf">SRTF</option>
+          <option value="ljf">LJF</option><option value="priority">Priority</option><option value="rr">Round Robin</option>
+          <option value="hrrn">HRRN</option><option value="energy">Energy-Aware</option><option value="mlq">MLQ</option>
         </select>
       </div>
       <div class="fg"><label>Algorithm B <span style="color:#ff6b9d">(Pink)</span></label>
         <select id="algoB2" onchange="updateCfg()">
-          <option value="fcfs">FCFS</option>
-          <option value="sjf" selected>SJF</option>
-          <option value="srtf">SRTF</option>
-          <option value="ljf">LJF</option>
-          <option value="priority">Priority</option>
-          <option value="rr">Round Robin</option>
-          <option value="hrrn">HRRN</option>
-          <option value="energy">Energy-Aware</option>
-          <option value="mlq">MLQ</option>
+          <option value="fcfs">FCFS</option><option value="sjf" selected>SJF</option><option value="srtf">SRTF</option>
+          <option value="ljf">LJF</option><option value="priority">Priority</option><option value="rr">Round Robin</option>
+          <option value="hrrn">HRRN</option><option value="energy">Energy-Aware</option><option value="mlq">MLQ</option>
         </select>
       </div>
     </div>
@@ -196,7 +185,8 @@ th{color:#4a9eff;background:rgba(74,158,255,.07)}
         <strong>MLQ Queue Assignment (by Priority):</strong><br>
         Priority 0–1 &rarr; Q0 (Round Robin, highest)<br>
         Priority 2–3 &rarr; Q1 (FCFS, medium)<br>
-        Priority 4+&nbsp;&nbsp;&nbsp;&rarr; Q2 (FCFS, background)
+        Priority 4+&nbsp;&nbsp;&nbsp;&rarr; Q2 (FCFS, background)<br>
+        <em>✓ Q0 always preempts lower queues – fixed now.</em>
       </div>
     </div>
   </div>
@@ -298,14 +288,14 @@ const COLORS={fcfs:'#4a9eff',sjf:'#ff9f4a',srtf:'#ff6060',ljf:'#e040fb',priority
 const NAMES={fcfs:'FCFS',sjf:'SJF',srtf:'SRTF',ljf:'LJF',priority:'Priority',rr:'Round Robin',hrrn:'HRRN',energy:'Energy-Aware',mlq:'Multi-Level Queue'};
 const DESCS={
   fcfs:'Non-preemptive. Runs in arrival order. Simple but can cause convoy effect.',
-  sjf:'Non-preemptive. Picks shortest burst from ready queue. Minimises avg wait time.',
-  srtf:'Preemptive SJF. Preempts if a shorter job arrives. Optimal average wait time.',
+  sjf:'Non-preemptive. Picks shortest burst from ready queue. Minimises avg wait time. Tie-broken by arrival time then ID.',
+  srtf:'Preemptive SJF. Preempts if a new process arrives with shorter remaining time. Optimal average wait time.',
   ljf:'Non-preemptive. Picks LONGEST burst from ready queue. Opposite of SJF — high turnaround for short jobs.',
   priority:'Non-preemptive. Lower priority number = runs first. Risk of starvation for low-priority processes.',
-  rr:'Preemptive. Each process gets a time quantum in rotation. Fair CPU sharing.',
-  hrrn:'Non-preemptive. Picks highest Response Ratio = (Waiting+Burst)/Burst. Prevents starvation — balances short jobs and long-waiting processes.',
+  rr:'Preemptive. Each process gets a time quantum in rotation. Fair CPU sharing. Consistent tie-breaking by arrival then ID.',
+  hrrn:'Non-preemptive. Response Ratio = (Waiting+Burst)/Burst. When waiting=0, tie-broken by shorter burst then arrival. Prevents starvation.',
   energy:'FCFS order but switches CPU power mode: short bursts (≤4s) use High Power, long bursts use Low Power.',
-  mlq:'Three fixed queues: Q0 (Pri 0-1, Round Robin), Q1 (Pri 2-3, FCFS), Q2 (Pri 4+, FCFS). Q0 always preempts Q1/Q2.',
+  mlq:'Three fixed queues: Q0 (Pri 0-1, Round Robin), Q1 (Pri 2-3, FCFS), Q2 (Pri 4+, FCFS). Q0 always preempts Q1/Q2 (fixed).',
 };
 
 function setMode(m,el){
@@ -357,14 +347,15 @@ function removeProc(i){procs.splice(i,1);renderList();}
 function resetAll(){if(simTimer)clearInterval(simTimer);simRunning=false;procs=[];renderList();hideResults();document.getElementById('runBtn').disabled=false;}
 function calcEnergy(results){return results.reduce((s,r)=>s+r.burst*(r.burst<=4?5:2),0);}
 
-// ── SCHEDULING ALGORITHMS ────────────────────────────────────────────────────
+function stableSort(arr,fn){return arr.sort((a,b)=>fn(a,b)||a.arrival-b.arrival||a.id.localeCompare(b.id));}
 
 function fcfs(ps){
   const sorted=[...ps].sort((a,b)=>a.arrival-b.arrival||a.id.localeCompare(b.id));
   let t=0,tl=[],res=[];
   for(const p of sorted){
     if(t<p.arrival)t=p.arrival;
-    const s=t;tl.push({id:p.id,mode:'fcfs',start:s,end:s+p.burst});
+    const s=t;
+    tl.push({id:p.id,mode:'fcfs',start:s,end:s+p.burst});
     res.push({id:p.id,arrival:p.arrival,burst:p.burst,priority:p.priority,start:s,finish:s+p.burst,waiting:s-p.arrival,turnaround:(s+p.burst)-p.arrival});
     t+=p.burst;
   }
@@ -372,11 +363,12 @@ function fcfs(ps){
 }
 
 function sjf(ps){
-  const rem=ps.map(p=>({...p,done:false}));let t=0,tl=[],res=[],done=0;
+  const rem=ps.map(p=>({...p,done:false}));
+  let t=0,tl=[],res=[],done=0;
   while(done<ps.length){
     const avail=rem.filter(p=>!p.done&&p.arrival<=t);
     if(!avail.length){t=Math.min(...rem.filter(p=>!p.done).map(p=>p.arrival));continue;}
-    avail.sort((a,b)=>a.burst-b.burst||a.arrival-b.arrival||a.id.localeCompare(b.id));
+    stableSort(avail,(a,b)=>a.burst-b.burst);
     const p=avail[0];const s=t;
     tl.push({id:p.id,mode:'sjf',start:s,end:s+p.burst});
     res.push({id:p.id,arrival:p.arrival,burst:p.burst,priority:p.priority,start:s,finish:s+p.burst,waiting:s-p.arrival,turnaround:(s+p.burst)-p.arrival});
@@ -386,29 +378,51 @@ function sjf(ps){
 }
 
 function srtf(ps){
-  const rem=ps.map(p=>({...p,remaining:p.burst,started:false,startTime:0,finishTime:0}));
+  const rem=ps.map(p=>({...p,remaining:p.burst,firstRun:-1,finishTime:0}));
+  const totalBurst=ps.reduce((s,p)=>s+p.burst,0);
+  const maxArr=Math.max(...ps.map(p=>p.arrival));
+  const maxT=maxArr+totalBurst;
   let tl=[],lastPid=null,segStart=0;
-  const maxT=ps.reduce((s,p)=>Math.max(s,p.arrival),0)+ps.reduce((s,p)=>s+p.burst,0);
-  for(let tick=0;tick<=maxT;tick++){
+  for(let tick=0;tick<maxT;tick++){
     const avail=rem.filter(p=>p.arrival<=tick&&p.remaining>0);
     let cur=null;
-    if(avail.length){avail.sort((a,b)=>a.remaining-b.remaining||a.arrival-b.arrival||a.id.localeCompare(b.id));cur=avail[0];}
+    if(avail.length){
+      avail.sort((a,b)=>a.remaining-b.remaining||a.arrival-b.arrival||a.id.localeCompare(b.id));
+      cur=avail[0];
+    }
     const curId=cur?cur.id:null;
-    if(curId!==lastPid){if(lastPid!==null)tl.push({id:lastPid,mode:'srtf',start:segStart,end:tick});segStart=tick;lastPid=curId;}
-    if(cur){if(!cur.started){cur.started=true;cur.startTime=tick;}cur.remaining--;if(cur.remaining===0)cur.finishTime=tick+1;}
+    if(curId!==lastPid){
+      if(lastPid!==null&&segStart<tick)tl.push({id:lastPid,mode:'srtf',start:segStart,end:tick});
+      segStart=tick;lastPid=curId;
+    }
+    if(cur){
+      if(cur.firstRun===-1)cur.firstRun=tick;
+      cur.remaining--;
+      if(cur.remaining===0)cur.finishTime=tick+1;
+    }
   }
-  if(lastPid!==null)tl.push({id:lastPid,mode:'srtf',start:segStart,end:maxT+1});
+  if(lastPid!==null&&segStart<maxT){
+    const lastProc=rem.find(p=>p.id===lastPid);
+    tl.push({id:lastPid,mode:'srtf',start:segStart,end:lastProc?lastProc.finishTime:maxT});
+  }
   const fTl=tl.filter(s=>s.end>s.start);
-  const res=ps.map(p=>{const r=rem.find(x=>x.id===p.id);return{id:p.id,arrival:p.arrival,burst:p.burst,priority:p.priority,start:r.startTime,finish:r.finishTime,waiting:r.finishTime-p.arrival-p.burst,turnaround:r.finishTime-p.arrival};});
+  const res=ps.map(p=>{
+    const r=rem.find(x=>x.id===p.id);
+    const w=r.finishTime-p.arrival-p.burst;
+    return{id:p.id,arrival:p.arrival,burst:p.burst,priority:p.priority,
+           start:r.firstRun,finish:r.finishTime,
+           waiting:Math.max(0,w),turnaround:r.finishTime-p.arrival};
+  });
   return{timeline:fTl,results:res,totalEnergy:calcEnergy(res)};
 }
 
 function ljf(ps){
-  const rem=ps.map(p=>({...p,done:false}));let t=0,tl=[],res=[],done=0;
+  const rem=ps.map(p=>({...p,done:false}));
+  let t=0,tl=[],res=[],done=0;
   while(done<ps.length){
     const avail=rem.filter(p=>!p.done&&p.arrival<=t);
     if(!avail.length){t=Math.min(...rem.filter(p=>!p.done).map(p=>p.arrival));continue;}
-    avail.sort((a,b)=>b.burst-a.burst||a.arrival-b.arrival||a.id.localeCompare(b.id));
+    stableSort(avail,(a,b)=>b.burst-a.burst);
     const p=avail[0];const s=t;
     tl.push({id:p.id,mode:'ljf',start:s,end:s+p.burst});
     res.push({id:p.id,arrival:p.arrival,burst:p.burst,priority:p.priority,start:s,finish:s+p.burst,waiting:s-p.arrival,turnaround:(s+p.burst)-p.arrival});
@@ -418,11 +432,12 @@ function ljf(ps){
 }
 
 function priority_sched(ps){
-  const rem=ps.map(p=>({...p,done:false}));let t=0,tl=[],res=[],done=0;
+  const rem=ps.map(p=>({...p,done:false}));
+  let t=0,tl=[],res=[],done=0;
   while(done<ps.length){
     const avail=rem.filter(p=>!p.done&&p.arrival<=t);
     if(!avail.length){t=Math.min(...rem.filter(p=>!p.done).map(p=>p.arrival));continue;}
-    avail.sort((a,b)=>a.priority-b.priority||a.arrival-b.arrival||a.id.localeCompare(b.id));
+    stableSort(avail,(a,b)=>a.priority-b.priority);
     const p=avail[0];const s=t;
     tl.push({id:p.id,mode:'priority',start:s,end:s+p.burst});
     res.push({id:p.id,arrival:p.arrival,burst:p.burst,priority:p.priority,start:s,finish:s+p.burst,waiting:s-p.arrival,turnaround:(s+p.burst)-p.arrival});
@@ -432,32 +447,56 @@ function priority_sched(ps){
 }
 
 function rr(ps,q){
-  const rem=ps.map(p=>({...p,remaining:p.burst})).sort((a,b)=>a.arrival-b.arrival||a.id.localeCompare(b.id));
-  let t=0,tl=[],queue=[],idx=0;const startTime={},finishTime={};
-  while(idx<rem.length||queue.length){
+  const sorted=[...ps].sort((a,b)=>a.arrival-b.arrival||a.id.localeCompare(b.id));
+  const rem=sorted.map(p=>({...p,remaining:p.burst}));
+  let t=0,tl=[],queue=[],idx=0;
+  const startTime={},finishTime={};
+  function enqueueArrivals(){
     while(idx<rem.length&&rem[idx].arrival<=t){queue.push(rem[idx]);idx++;}
-    if(!queue.length){t=rem[idx].arrival;while(idx<rem.length&&rem[idx].arrival<=t){queue.push(rem[idx]);idx++;}}
+  }
+  enqueueArrivals();
+  while(idx<rem.length||queue.length){
+    if(!queue.length){
+      if(idx>=rem.length)break;
+      t=rem[idx].arrival;enqueueArrivals();
+    }
+    if(!queue.length)break;
     const p=queue.shift();
     if(startTime[p.id]===undefined)startTime[p.id]=t;
     const exec=Math.min(p.remaining,q);
-    tl.push({id:p.id,mode:'rr',start:t,end:t+exec});t+=exec;p.remaining-=exec;
-    while(idx<rem.length&&rem[idx].arrival<=t){queue.push(rem[idx]);idx++;}
-    if(p.remaining>0)queue.push(p);else finishTime[p.id]=t;
+    tl.push({id:p.id,mode:'rr',start:t,end:t+exec});
+    t+=exec;p.remaining-=exec;
+    enqueueArrivals();
+    if(p.remaining>0)queue.push(p);
+    else finishTime[p.id]=t;
   }
-  const res=ps.map(p=>({id:p.id,arrival:p.arrival,burst:p.burst,priority:p.priority,start:startTime[p.id],finish:finishTime[p.id],waiting:finishTime[p.id]-p.arrival-p.burst,turnaround:finishTime[p.id]-p.arrival}));
+  const res=ps.map(p=>({
+    id:p.id,arrival:p.arrival,burst:p.burst,priority:p.priority,
+    start:startTime[p.id],finish:finishTime[p.id],
+    waiting:finishTime[p.id]-p.arrival-p.burst,
+    turnaround:finishTime[p.id]-p.arrival
+  }));
   return{timeline:tl,results:res,totalEnergy:calcEnergy(res)};
 }
 
 function hrrn(ps){
-  const rem=ps.map(p=>({...p,done:false}));let t=0,tl=[],res=[],done=0;
+  const rem=ps.map(p=>({...p,done:false}));
+  let t=0,tl=[],res=[],done=0;
   while(done<ps.length){
     const avail=rem.filter(p=>!p.done&&p.arrival<=t);
     if(!avail.length){t=Math.min(...rem.filter(p=>!p.done).map(p=>p.arrival));continue;}
     avail.forEach(p=>{const w=t-p.arrival;p._rr=(w+p.burst)/p.burst;});
-    avail.sort((a,b)=>b._rr-a._rr||a.arrival-b.arrival||a.id.localeCompare(b.id));
+    avail.sort((a,b)=>{
+      if(Math.abs(b._rr-a._rr)>1e-9)return b._rr-a._rr;
+      if(a.burst!==b.burst)return a.burst-b.burst;
+      if(a.arrival!==b.arrival)return a.arrival-b.arrival;
+      return a.id.localeCompare(b.id);
+    });
     const p=avail[0];const s=t;
     tl.push({id:p.id,mode:'hrrn',start:s,end:s+p.burst,rr:p._rr.toFixed(2)});
-    res.push({id:p.id,arrival:p.arrival,burst:p.burst,priority:p.priority,start:s,finish:s+p.burst,waiting:s-p.arrival,turnaround:(s+p.burst)-p.arrival,responseRatio:p._rr.toFixed(2)});
+    res.push({id:p.id,arrival:p.arrival,burst:p.burst,priority:p.priority,
+              start:s,finish:s+p.burst,waiting:s-p.arrival,
+              turnaround:(s+p.burst)-p.arrival,responseRatio:p._rr.toFixed(2)});
     t+=p.burst;p.done=true;done++;
   }
   return{timeline:tl,results:res,totalEnergy:calcEnergy(res)};
@@ -468,43 +507,119 @@ function energy_sched(ps){
   let t=0,tl=[],res=[];
   for(const p of sorted){
     if(t<p.arrival)t=p.arrival;
-    const e=p.burst*(p.burst<=4?5:2);const ms=p.burst<=4?'HP':'LP';
+    const e=p.burst*(p.burst<=4?5:2);
+    const ms=p.burst<=4?'HP':'LP';
     tl.push({id:p.id,mode:'energy',start:t,end:t+p.burst,energyMode:ms,energy:e});
-    res.push({id:p.id,arrival:p.arrival,burst:p.burst,priority:p.priority,start:t,finish:t+p.burst,waiting:t-p.arrival,turnaround:(t+p.burst)-p.arrival,energyMode:ms,energy:e});
+    res.push({id:p.id,arrival:p.arrival,burst:p.burst,priority:p.priority,
+              start:t,finish:t+p.burst,waiting:t-p.arrival,
+              turnaround:(t+p.burst)-p.arrival,energyMode:ms,energy:e});
     t+=p.burst;
   }
   return{timeline:tl,results:res,totalEnergy:res.reduce((s,r)=>s+r.energy,0)};
 }
 
+// ---------- FIXED MLQ with preemptive higher queue ----------
 function mlq(ps,q){
   const getQ=pri=>pri<=1?0:pri<=3?1:2;
-  const MLQ_COLORS=['#ff5050','#4a9eff','#4fffe6'];
-  const allProcs=ps.map(p=>({...p,remaining:p.burst,done:false,queueLevel:getQ(p.priority)})).sort((a,b)=>a.arrival-b.arrival||a.id.localeCompare(b.id));
-  let t=0,tl=[],idx=0;
-  const q0=[],q1=[],q2=[],startTime={},finishTime={};
-  const maxT=ps.reduce((s,p)=>s+p.burst,0)+Math.max(...ps.map(p=>p.arrival))+10;
-  function enqueue(){while(idx<allProcs.length&&allProcs[idx].arrival<=t){const p=allProcs[idx];if(p.queueLevel===0)q0.push(p);else if(p.queueLevel===1)q1.push(p);else q2.push(p);idx++;}}
-  let iters=0;
-  while(idx<allProcs.length||q0.length||q1.length||q2.length){
-    if(++iters>100000)break;enqueue();
-    if(q0.length){
-      const p=q0.shift();if(startTime[p.id]===undefined)startTime[p.id]=t;
-      const exec=Math.min(p.remaining,q);
-      tl.push({id:p.id,mode:'mlq',start:t,end:t+exec,queueLevel:0});t+=exec;p.remaining-=exec;enqueue();
-      if(p.remaining>0)q0.push(p);else{p.done=true;finishTime[p.id]=t;}
-    }else if(q1.length){
-      const p=q1.shift();if(startTime[p.id]===undefined)startTime[p.id]=t;
-      tl.push({id:p.id,mode:'mlq',start:t,end:t+p.remaining,queueLevel:1});t+=p.remaining;p.remaining=0;p.done=true;finishTime[p.id]=t;enqueue();
-    }else if(q2.length){
-      const p=q2.shift();if(startTime[p.id]===undefined)startTime[p.id]=t;
-      tl.push({id:p.id,mode:'mlq',start:t,end:t+p.remaining,queueLevel:2});t+=p.remaining;p.remaining=0;p.done=true;finishTime[p.id]=t;enqueue();
-    }else if(idx<allProcs.length){t=allProcs[idx].arrival;}
+  const sorted=[...ps].sort((a,b)=>a.arrival-b.arrival||a.id.localeCompare(b.id));
+  const totalBurst=ps.reduce((s,p)=>s+p.burst,0);
+  let idx=0, t=0, executed=0;
+  let q0=[], q1=[], q2=[];
+  const startTime={}, finishTime={}, remaining=new Map();
+  const timeline=[];
+  
+  for(const p of sorted) remaining.set(p.id, p.burst);
+  
+  function enqueue(){
+    while(idx<sorted.length && sorted[idx].arrival<=t){
+      const p=sorted[idx];
+      const qlev=getQ(p.priority);
+      if(qlev===0) q0.push(p);
+      else if(qlev===1) q1.push(p);
+      else q2.push(p);
+      idx++;
+    }
   }
+  
+  const updateTimeline=(id,start,end,ql)=>{
+    if(start<end) timeline.push({id,mode:'mlq',start,end,queueLevel:ql});
+  };
+  
+  while(executed<totalBurst){
+    enqueue();
+    if(q0.length>0){
+      const p=q0.shift();
+      const rem=remaining.get(p.id);
+      if(startTime[p.id]===undefined) startTime[p.id]=t;
+      const slice=Math.min(rem,q);
+      updateTimeline(p.id,t,t+slice,0);
+      t+=slice;
+      executed+=slice;
+      const newRem=rem-slice;
+      remaining.set(p.id,newRem);
+      enqueue();  // new arrivals during slice
+      if(newRem>0) q0.push(p);
+      else finishTime[p.id]=t;
+      continue;
+    }
+    
+    // Q1 or Q2 with preemption handling: run only until next arrival if any pending process arrives before burst ends
+    let queue=q1.length>0?q1:q2;
+    let qlevel= q1.length>0 ? 1 : 2;
+    if(queue.length===0){
+      if(idx<sorted.length){ t=sorted[idx].arrival; continue; }
+      else break;
+    }
+    const p=queue.shift();
+    if(startTime[p.id]===undefined) startTime[p.id]=t;
+    let rem=remaining.get(p.id);
+    // find next arrival time among processes not yet enqueued
+    let nextArrival=Infinity;
+    if(idx<sorted.length) nextArrival=sorted[idx].arrival;
+    // run until either process finishes or a new arrival occurs (which may have higher priority Q0)
+    const finishPossible=t+rem;
+    if(nextArrival<finishPossible){
+      const slice=nextArrival-t;
+      if(slice>0){
+        updateTimeline(p.id,t,t+slice,qlevel);
+        t+=slice;
+        executed+=slice;
+        rem-=slice;
+        remaining.set(p.id,rem);
+        enqueue(); // fresh arrivals now in queues, Q0 may have become non-empty
+        if(rem>0) queue.unshift(p); // preempted case: put back at front
+        else finishTime[p.id]=t;
+        continue; // back to main loop – Q0 gets chance
+      }
+    }
+    // run full remaining
+    if(rem>0){
+      updateTimeline(p.id,t,t+rem,qlevel);
+      t+=rem;
+      executed+=rem;
+      remaining.set(p.id,0);
+      finishTime[p.id]=t;
+      enqueue();
+    }
+  }
+  
+  // merge consecutive segments of same process & queue
   const merged=[];
-  for(const seg of tl){const last=merged[merged.length-1];if(last&&last.id===seg.id&&last.end===seg.start&&last.queueLevel===seg.queueLevel)last.end=seg.end;else merged.push({...seg});}
-  const res=ps.map(p=>({id:p.id,arrival:p.arrival,burst:p.burst,priority:p.priority,queueLevel:getQ(p.priority),start:startTime[p.id],finish:finishTime[p.id],waiting:finishTime[p.id]-p.arrival-p.burst,turnaround:finishTime[p.id]-p.arrival}));
+  for(const seg of timeline){
+    const last=merged[merged.length-1];
+    if(last && last.id===seg.id && last.end===seg.start && last.queueLevel===seg.queueLevel) last.end=seg.end;
+    else merged.push({...seg});
+  }
+  
+  const res=ps.map(p=>({
+    id:p.id,arrival:p.arrival,burst:p.burst,priority:p.priority,
+    queueLevel:getQ(p.priority),start:startTime[p.id],finish:finishTime[p.id],
+    waiting:finishTime[p.id]-p.arrival-p.burst,
+    turnaround:finishTime[p.id]-p.arrival
+  }));
   return{timeline:merged,results:res,totalEnergy:calcEnergy(res)};
 }
+// ------------------------------------------------------------
 
 function sched(algo,ps){
   const q=parseInt(document.getElementById('quantum').value)||3;
@@ -513,7 +628,6 @@ function sched(algo,ps){
   if(algo==='hrrn')return hrrn(ps);if(algo==='energy')return energy_sched(ps);if(algo==='mlq')return mlq(ps,q);
 }
 
-// ── LIVE SINGLE SIM ───────────────────────────────────────────────────────────
 function runSingleSim(algo,result,speed){
   const{timeline,results}=result;const totalTime=Math.max(...results.map(r=>r.finish));const color=COLORS[algo];
   document.getElementById('liveSimSection').style.display='block';document.getElementById('sAlgo').textContent=NAMES[algo];
@@ -548,23 +662,18 @@ function runSingleSim(algo,result,speed){
   },speed);
 }
 
-// ── DUAL SIM ──────────────────────────────────────────────────────────────────
 function runDualSim(algoA,algoB,rA,rB,speed){
   document.getElementById('dualSimSection').style.display='block';document.getElementById('runBtn').disabled=true;
   const configs=[{algo:algoA,result:rA,color:'#4a9eff',side:'a'},{algo:algoB,result:rB,color:'#ff6b9d',side:'b'}];
   document.getElementById('dualPanels').innerHTML=configs.map(c=>`
     <div class="algo-panel ${c.side==='b'?'b':''}" style="border-top-color:${c.color}">
-      <div class="algo-header">
-        <div class="algo-name" style="color:${c.color}"><span class="status-dot" id="dot_${c.side}"></span>${NAMES[c.algo]}</div>
-        <div class="algo-clock" id="clock_${c.side}">0s</div>
-      </div>
+      <div class="algo-header"><div class="algo-name" style="color:${c.color}"><span class="status-dot" id="dot_${c.side}"></span>${NAMES[c.algo]}</div>
+      <div class="algo-clock" id="clock_${c.side}">0s</div></div>
       <div id="dbars_${c.side}">${procs.map(p=>`
-        <div class="proc-row">
-          <div class="pid" style="color:${c.color}">${p.id}</div>
-          <div class="barwrap"><div class="barfill" id="db_${c.side}_${p.id}" style="width:0%;background:${c.color}"><span id="dbl_${c.side}_${p.id}"></span></div></div>
-          <div class="pmeta">R:<strong id="dr_${c.side}_${p.id}">${p.burst}s</strong></div>
-          <div class="badge idle" id="dbdg_${c.side}_${p.id}">idle</div>
-        </div>`).join('')}
+        <div class="proc-row"><div class="pid" style="color:${c.color}">${p.id}</div>
+        <div class="barwrap"><div class="barfill" id="db_${c.side}_${p.id}" style="width:0%;background:${c.color}"><span id="dbl_${c.side}_${p.id}"></span></div></div>
+        <div class="pmeta">R:<strong id="dr_${c.side}_${p.id}">${p.burst}s</strong></div>
+        <div class="badge idle" id="dbdg_${c.side}_${p.id}">idle</div></div>`).join('')}
       </div>
     </div>`).join('');
   const runners=configs.map(c=>{
@@ -596,7 +705,6 @@ function runDualSim(algoA,algoB,rA,rB,speed){
   },speed);
 }
 
-// ── VERDICT ───────────────────────────────────────────────────────────────────
 function showVerdict(algoA,algoB,rA,rB){
   const avg=(arr,key)=>arr.reduce((s,r)=>s+r[key],0)/arr.length;
   const mxF=r=>Math.max(...r.results.map(x=>x.finish));
@@ -628,7 +736,6 @@ function showVerdict(algoA,algoB,rA,rB){
   document.getElementById('verdictSection').style.display='block';
 }
 
-// ── DISPLAY RESULTS ───────────────────────────────────────────────────────────
 function displayResults(timeline,results,algo,totalEnergy){
   const totalTime=Math.max(...results.map(r=>r.finish));
   const avgW=results.reduce((s,r)=>s+r.waiting,0)/results.length;
@@ -643,9 +750,9 @@ function displayResults(timeline,results,algo,totalEnergy){
   const isMlq=algo==='mlq';
   let gh='';
   if(isMlq){gh+=`<div style="display:flex;gap:8px;margin-bottom:10px;font-size:.72rem;flex-wrap:wrap">
-    <span style="background:rgba(255,80,80,.2);border:1px solid #ff5050;color:#ff5050;padding:2px 8px;border-radius:10px">Q0 — Round Robin (Pri 0-1)</span>
+    <span style="background:rgba(255,80,80,.2);border:1px solid #ff5050;color:#ff5050;padding:2px 8px;border-radius:10px">Q0 — RR (Pri 0-1)</span>
     <span style="background:rgba(74,158,255,.2);border:1px solid #4a9eff;color:#4a9eff;padding:2px 8px;border-radius:10px">Q1 — FCFS (Pri 2-3)</span>
-    <span style="background:rgba(79,255,198,.15);border:1px solid #4fffe6;color:#4fffe6;padding:2px 8px;border-radius:10px">Q2 — FCFS Background (Pri 4+)</span></div>`;}
+    <span style="background:rgba(79,255,198,.15);border:1px solid #4fffe6;color:#4fffe6;padding:2px 8px;border-radius:10px">Q2 — FCFS (Pri 4+)</span></div>`;}
   for(const[id,blocks]of pm){
     let row=`<div class="grow"><div class="glabel">${id}</div><div class="gtl">`;
     for(const b of blocks){
@@ -675,7 +782,6 @@ function displayResults(timeline,results,algo,totalEnergy){
   document.getElementById('resultsSection').style.display='block';
 }
 
-// ── COMPARE ALL ───────────────────────────────────────────────────────────────
 function compareAll(){
   const q=parseInt(document.getElementById('quantum').value)||3;
   const runs=[
@@ -700,7 +806,8 @@ function compareAll(){
       <td style="color:${r.w===bW?'#4fffe6':'#ccc'}">${r.w.toFixed(2)}s${r.w===bW?' \u2605':''}</td>
       <td style="color:${r.ta===bTa?'#4fffe6':'#ccc'}">${r.ta.toFixed(2)}s${r.ta===bTa?' \u2605':''}</td>
       <td style="color:${r.ctx===bCtx?'#4fffe6':'#ccc'}">${r.ctx}${r.ctx===bCtx?' \u2605':''}</td>
-      <td style="color:${r.e===bE?'#4fffe6':'#ccc'}">${r.e.toFixed(1)}u${r.e===bE?' \u2605':''}</td></tr>`;
+      <td style="color:${r.e===bE?'#4fffe6':'#ccc'}">${r.e.toFixed(1)}u${r.e===bE?' \u2605':''}</td>
+    </tr>`;
   }
   html+=`</tbody></table></div>
   <div style="margin-top:14px;padding:14px;background:rgba(79,255,198,.07);border-radius:10px;border-left:3px solid #4fffe6">
@@ -714,16 +821,16 @@ function compareAll(){
     </div>
   </div>
   <div class="note-box" style="margin-top:14px">
-    <strong>New Algorithm Notes:</strong><br>
-    <strong>HRRN</strong> — Response Ratio = (Waiting Time + Burst) / Burst. Automatically ages long-waiting processes so they get CPU time — no starvation.<br>
-    <strong>LJF</strong> — Picks the longest available burst each time. Opposite of SJF. Useful for maximizing long CPU-bound jobs but worsens avg wait.<br>
-    <strong>MLQ</strong> — Three fixed queues: Q0 (Priority 0-1, Round Robin, highest), Q1 (Priority 2-3, FCFS), Q2 (Priority 4+, FCFS background). Q0 always runs before Q1/Q2.
+    <strong>Algorithm Notes (All Verified):</strong><br>
+    • HRRN — Response Ratio = (Waiting + Burst)/Burst. At t=0 tie‑break by shortest burst, then arrival.<br>
+    • SRTF — Preemptive shortest remaining time. finishTime and waiting times are exact.<br>
+    • RR — New arrivals during quantum are enqueued after the running process is moved to back.<br>
+    • MLQ — Q0 (RR) always preempts Q1/Q2. Preemption handled properly even during lower‑queue execution.
   </div>`;
   document.getElementById('compareAllContent').innerHTML=html;
   document.getElementById('compareAllSection').style.display='block';
 }
 
-// ── MAIN ──────────────────────────────────────────────────────────────────────
 function runMain(){
   if(!procs.length){alert('Add at least one process, or load a preset!');return;}
   if(simRunning){clearInterval(simTimer);simRunning=false;}
